@@ -21,7 +21,7 @@
 #include "qv2ray/v2/components/proxy/QvProxyConfigurator.hpp"
 #include "qv2ray/v2/ui/LogHighlighter.hpp"
 
-#ifndef NKR_NO_EXTERNAL
+#ifndef NKR_NO_ZXING
 #include "3rdparty/ZxingQtReader.hpp"
 #endif
 
@@ -462,8 +462,14 @@ void MainWindow::dialog_message_impl(const QString &sender, const QString &info)
     }
     // sender
     if (sender == Dialog_DialogEditProfile) {
-        if (info == "accept") {
+        auto msg = info.split(",");
+        if (msg.contains("accept")) {
             refresh_proxy_list();
+            if (msg.contains("restart")) {
+                if (QMessageBox::question(GetMessageBoxParent(), tr("Confirmation"), tr("Settings changed, restart proxy?")) == QMessageBox::StandardButton::Yes) {
+                    neko_start(NekoRay::dataStore->started_id);
+                }
+            }
         }
     } else if (sender == Dialog_DialogManageGroups) {
         if (info.startsWith("refresh")) {
@@ -760,6 +766,7 @@ void MainWindow::refresh_proxy_list_impl(const int &id, NekoRay::GroupSortAction
             case NekoRay::GroupSortMethod::ById: {
                 // Clear Order
                 ui->proxyListTable->order.clear();
+                ui->proxyListTable->callback_save_order();
                 break;
             }
             case NekoRay::GroupSortMethod::ByAddress:
@@ -1095,8 +1102,7 @@ void MainWindow::display_qr_link(bool nkrFormat) {
 }
 
 void MainWindow::on_menu_scan_qr_triggered() {
-    NO_ADD_TO_SUBSCRIPTION_GROUP
-#ifndef NKR_NO_EXTERNAL
+#ifndef NKR_NO_ZXING
     using namespace ZXingQt;
 
     hide();
@@ -1118,6 +1124,8 @@ void MainWindow::on_menu_scan_qr_triggered() {
     if (text.isEmpty()) {
         MessageBoxInfo(software_name, tr("QR Code not found"));
     } else {
+        show_log_impl("QR Code Result:\n" + text);
+        NO_ADD_TO_SUBSCRIPTION_GROUP
         NekoRay::sub::groupUpdater->AsyncUpdate(text);
     }
 #endif
@@ -1342,6 +1350,7 @@ void MainWindow::refresh_connection_list(const QJsonArray &arr) {
     int row = -1;
     for (const auto &_item: arr) {
         auto item = _item.toObject();
+        if (NekoRay::dataStore->ignoreConnTag.contains(item["Tag"].toString())) continue;
 
         row++;
         ui->tableWidget_conn->insertRow(row);
@@ -1379,7 +1388,7 @@ void MainWindow::refresh_connection_list(const QJsonArray &arr) {
 
 // Hotkey
 
-#ifndef NKR_NO_EXTERNAL
+#ifndef NKR_NO_QHOTKEY
 
 #include <QHotkey>
 

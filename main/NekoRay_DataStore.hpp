@@ -47,6 +47,7 @@ namespace NekoRay {
         bool core_prepare_exit = false;
         int running_spmode = NekoRay::SystemProxyMode::DISABLE;
         bool need_keep_vpn_off = false;
+        QStringList ignoreConnTag = {};
 
         Routing *routing = new Routing;
         int imported_count = 0;
@@ -80,6 +81,7 @@ namespace NekoRay {
         QString user_agent = "Nekoray/1.0 (Prefer Clash Format)";
         bool sub_use_proxy = false;
         bool sub_clear = false;
+        bool sub_insecure = false;
 
         // Security
         bool insecure_hint = true;
