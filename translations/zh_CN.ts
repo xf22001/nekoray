@@ -203,6 +203,10 @@
         <source>Ignore TLS errors when updating subscription</source>
         <translation>更新订阅时忽略 TLS 错误</translation>
     </message>
+    <message>
+        <source>Enable hook.js</source>
+        <translation>启用 hook.js 功能</translation>
+    </message>
 </context>
 <context>
     <name>DialogEditGroup</name>
@@ -375,6 +379,10 @@
     <message>
         <source>Trigger main window</source>
         <translation>显示/隐藏主窗口</translation>
+    </message>
+    <message>
+        <source>System Proxy</source>
+        <translation>系统代理</translation>
     </message>
 </context>
 <context>
