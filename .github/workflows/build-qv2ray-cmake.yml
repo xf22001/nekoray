@@ -13,7 +13,7 @@ jobs:
   build-go:
     strategy:
       matrix:
-        cross_os: [ windows, linux, darwin ]
+        cross_os: [ linux ]
         cross_arch: [ amd64 ]
         include:
           - cross_os: asset
@@ -55,7 +55,7 @@ jobs:
   build-cpp:
     strategy:
       matrix:
-        platform: [ windows-2022, ubuntu-20.04, macos-10.15 ]
+        platform: [ ubuntu-20.04 ]
         arch: [ x64 ]
         qt_version: [ 5.15.2 ]
       fail-fast: false
@@ -70,38 +70,7 @@ jobs:
         uses: actions/checkout@v3
         with:
           submodules: "recursive"
-      - name: Install MSVC compiler
-        if: matrix.platform == 'windows-2022'
-        uses: ilammy/msvc-dev-cmd@v1
-        with:
-          # 14.1 is for vs2017, 14.2 is vs2019, following the upstream vcpkg build from Qv2ray-deps repo
-          toolset: 14.2
-          arch: ${{ matrix.arch }}
-      - name: Download Artifacts for macOS
-        if: matrix.platform == 'macos-10.15'
-        uses: actions/download-artifact@v3
-        with:
-          path: download-artifact
       # ========================================================================================================= Qt Install
-      - name: macOS - Install Qt 5.15
-        if: matrix.platform == 'macos-10.15'
-        uses: jurplel/install-qt-action@v3
-        with:
-          version: ${{ matrix.qt_version }}
-          py7zrversion: ' '
-          aqtversion: ' '
-          setup-python: false
-          cache: true
-          cache-key-prefix: QtCache-${{ matrix.platform }}-${{ matrix.arch }}-${{ matrix.qt_version }}
-      - name: Windows - Download Custom Qt 5.15 SDK
-        shell: bash
-        if: matrix.platform == 'windows-2022'
-        run: |
-          mkdir qtsdk ; cd qtsdk
-          curl -LSO https://github.com/MatsuriDayo/nekoray_qt_runtime/releases/download/20220503/Qt5.15.7-Windows-x86_64-VS2019-16.11.20-20221103.7z
-          7z x *.7z
-          rm *.7z
-          mv Qt* Qt
       - name: Linux - Install Qt 5.12 via apt
         shell: bash
         if: matrix.platform == 'ubuntu-20.04'
@@ -123,20 +92,6 @@ jobs:
         run: |
           ./libs/build_deps_all.sh
       # ========================================================================================================= Generate MakeFile and Build
-      - name: Windows - ${{ matrix.qt_version }} - Generate MakeFile and Build
-        shell: bash
-        if: matrix.platform == 'windows-2022'
-        env:
-          CC: cl.exe
-          CXX: cl.exe
-        run: |
-          source libs/env_qtsdk.sh $PWD/qtsdk/Qt
-          mkdir build
-          cd build
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Release ..
-          ninja
-          cd ..
-          ./libs/deploy_windows64.sh
       - name: Linux - ${{ matrix.qt_version }} - Generate MakeFile and Build
         shell: bash
         if: matrix.platform == 'ubuntu-20.04'
@@ -147,16 +102,6 @@ jobs:
           ninja
           cd ..
           ./libs/deploy_linux64.sh
-      - name: macOS - ${{ matrix.qt_version }} - Generate MakeFile and Build
-        shell: bash
-        if: matrix.platform == 'macos-10.15'
-        run: |
-          mkdir build
-          cd build
-          cmake -GNinja -DCMAKE_BUILD_TYPE=Release -DNKR_PACKAGE_MACOS=1 ..
-          ninja
-          cd ..
-          ./libs/deploy_macos.sh
       # ========================================================================================================= Deployments
       - name: Tar files
         shell: bash
@@ -187,19 +132,11 @@ jobs:
           find . -name artifacts.tgz | xargs -n1 tar xvzf
           cd deployment
           cp -r assets/* linux64
-          cp -r assets/* windows64
           rm -rf assets *.pdb
           ####
           mv linux64 nekoray
           zip -r $version_standalone-linux64.zip nekoray
           rm -rf nekoray
-          ####
-          mv windows64 nekoray
-          zip -r $version_standalone-windows64.zip nekoray
-          rm -rf nekoray
-          ####
-          mv macos-amd64/nekoray.dmg $version_standalone-macos-amd64.dmg
-          rm -rf macos-amd64
       - name: Uploading Artifact
         uses: actions/upload-artifact@master
         with:
