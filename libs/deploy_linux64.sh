@@ -8,6 +8,7 @@ mkdir -p $DEST
 
 #### copy binary ####
 cp $BUILD/nekoray $DEST
+cp -a libs/deps $DEST
 
 #### copy so ####
 USR_LIB=/usr/lib/x86_64-linux-gnu
