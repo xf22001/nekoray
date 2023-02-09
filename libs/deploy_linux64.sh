@@ -9,7 +9,16 @@ mkdir -p $DEST
 #### copy binary ####
 cp $BUILD/nekoray $DEST
 
+#### Download: prebuilt runtime ####
+curl -Lso usr.zip https://github.com/MatsuriDayo/nekoray_qt_runtime/releases/download/20220503/20230202-5.12.8-ubuntu20.04-linux64.zip
+unzip usr.zip
+mv usr $DEST
+
+
 #### copy so ####
+# 5.11 looks buggy on new systems...
+exit
+
 USR_LIB=/usr/lib/x86_64-linux-gnu
 mkdir usr
 pushd usr
@@ -23,7 +32,8 @@ cp $USR_LIB/libQt5Svg.so.5 .
 cp $USR_LIB/libQt5Widgets.so.5 .
 cp $USR_LIB/libQt5X11Extras.so.5 .
 cp $USR_LIB/libQt5XcbQpa.so.5 .
-cp $USR_LIB/libxcb-util.so.1 .
+cp $USR_LIB/libdouble-conversion.so.? .
+cp $USR_LIB/libxcb-util.so.? .
 cp $USR_LIB/libicuuc.so.?? .
 cp $USR_LIB/libicui18n.so.?? .
 cp $USR_LIB/libicudata.so.?? .
