@@ -461,10 +461,6 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Outbound Domain Strategy</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remote DNS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -477,7 +473,7 @@
         <translation>فعال کردن مسیریابی DNS</translation>
     </message>
     <message>
-        <source>Domain Strategy</source>
+        <source>V2Ray Domain Strategy</source>
         <translation>استراتژی دامنه</translation>
     </message>
     <message>
@@ -568,6 +564,10 @@
         <source>Remote</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Inbound &amp; Outbound Domain Strategy</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogVPNSettings</name>
@@ -629,6 +629,14 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</source>
     <message>
         <source>Cancel</source>
         <translation type="unfinished">لغو کردن</translation>
+    </message>
+    <message>
+        <source>Don&apos;t ask for privilege elevation</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Already Admin</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
