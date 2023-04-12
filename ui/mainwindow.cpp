@@ -19,8 +19,8 @@
 
 #include "3rdparty/qrcodegen.hpp"
 #include "3rdparty/VT100Parser.hpp"
-#include "qv2ray/v2/components/proxy/QvProxyConfigurator.hpp"
-#include "qv2ray/v2/ui/LogHighlighter.hpp"
+#include "3rdparty/qv2ray/v2/components/proxy/QvProxyConfigurator.hpp"
+#include "3rdparty/qv2ray/v2/ui/LogHighlighter.hpp"
 
 #ifndef NKR_NO_ZXING
 #include "3rdparty/ZxingQtReader.hpp"
@@ -99,6 +99,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         }
         if (!Preset::SingBox::DomainStrategy.contains(NekoRay::dataStore->outbound_domain_strategy)) {
             NekoRay::dataStore->outbound_domain_strategy = "";
+        }
+        //
+        if (QDir("dashboard").isEmpty()) {
+            QDir().mkdir("dashboard");
+            QFile::copy(":/neko/dashboard-notice.html", "dashboard/index.html");
         }
     }
 
@@ -257,6 +262,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->menu_program_preference->addActions(ui->menu_preferences->actions());
     connect(ui->menu_add_from_clipboard2, &QAction::triggered, ui->menu_add_from_clipboard, &QAction::trigger);
     connect(ui->actionRestart_Program, &QAction::triggered, this, [=] { MW_dialog_message("", "RestartProgram"); });
+    connect(ui->actionShow_window, &QAction::triggered, this, [=] { tray->activated(QSystemTrayIcon::ActivationReason::Trigger); });
     //
     connect(ui->menu_program, &QMenu::aboutToShow, this, [=]() {
         ui->actionRemember_last_proxy->setChecked(NekoRay::dataStore->remember_enable);
@@ -627,7 +633,9 @@ void MainWindow::on_menu_exit_triggered() {
         QProcess::startDetached("./updater", QStringList{});
     } else if (exit_reason == 2) {
         QDir::setCurrent(QApplication::applicationDirPath());
-        QProcess::startDetached(qEnvironmentVariable("NKR_FROM_LAUNCHER") == "1" ? "./launcher" : QApplication::applicationFilePath(), QStringList{});
+        auto arguments = NekoRay::dataStore->argv;
+        if (arguments.length() > 0) arguments.removeFirst();
+        QProcess::startDetached(qEnvironmentVariable("NKR_FROM_LAUNCHER") == "1" ? "./launcher" : QApplication::applicationFilePath(), arguments);
     }
     tray->hide();
     QCoreApplication::quit();
@@ -865,6 +873,7 @@ void MainWindow::refresh_proxy_list_impl(const int &id, NekoRay::GroupSortAction
                               }
                               auto get_latency_for_sort = [](int id) {
                                   auto i = NekoRay::profileManager->GetProfile(id)->latency;
+                                  if (i == 0) i = 100000;
                                   if (i < 0) i = 99999;
                                   return i;
                               };
@@ -1129,16 +1138,19 @@ void MainWindow::display_qr_link(bool nkrFormat) {
         void refresh(bool is_nk) {
             auto link_display = is_nk ? link_nk : link;
             l2->setPlainText(link_display);
+            constexpr qint32 qr_padding = 2;
             //
             try {
                 qrcodegen::QrCode qr = qrcodegen::QrCode::encodeText(link_display.toUtf8().data(), qrcodegen::QrCode::Ecc::MEDIUM);
                 qint32 sz = qr.getSize();
-                im = QImage(sz, sz, QImage::Format_RGB32);
+                im = QImage(sz + qr_padding * 2, sz + qr_padding * 2, QImage::Format_RGB32);
                 QRgb black = qRgb(0, 0, 0);
                 QRgb white = qRgb(255, 255, 255);
+                im.fill(white);
                 for (int y = 0; y < sz; y++)
                     for (int x = 0; x < sz; x++)
-                        im.setPixel(x, y, qr.getModule(x, y) ? black : white);
+                        if (qr.getModule(x, y))
+                            im.setPixel(x + qr_padding, y + qr_padding, black);
                 show_qr(size());
             } catch (const std::exception &ex) {
                 QMessageBox::warning(nullptr, "error", ex.what());

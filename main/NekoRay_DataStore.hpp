@@ -65,6 +65,7 @@ namespace NekoRay {
         int resolve_count = 0;
 
         // Flags
+        QStringList argv = {};
         bool flag_use_appdata = false;
         bool flag_many = false;
         bool flag_tray = false;
@@ -101,6 +102,7 @@ namespace NekoRay {
         bool insecure_hint = true;
         bool skip_cert = false;
         int enable_js_hook = 0;
+        QString utlsFingerprint = "";
 
         // Remember
         int remember_spmode = NekoRay::SystemProxyMode::DISABLE;
@@ -146,6 +148,11 @@ namespace NekoRay {
         QString hotkey_group = "";
         QString hotkey_route = "";
         QString hotkey_system_proxy_menu = "";
+
+        // Core
+        bool core_box_auto_detect_interface = true;
+        int core_box_clash_api = -9090;
+        QString core_box_clash_api_secret = "";
 
         // Other Core
         ExtraCore *extraCore = new ExtraCore;

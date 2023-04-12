@@ -170,6 +170,7 @@ namespace NekoRay::sub {
         try {
             return n.as<std::string>().c_str();
         } catch (const YAML::Exception &ex) {
+            qDebug() << ex.what();
             return def;
         }
     }
@@ -178,6 +179,7 @@ namespace NekoRay::sub {
         try {
             return n.as<int>();
         } catch (const YAML::Exception &ex) {
+            qDebug() << ex.what();
             return def;
         }
     }
@@ -186,6 +188,7 @@ namespace NekoRay::sub {
         try {
             return n.as<bool>();
         } catch (const YAML::Exception &ex) {
+            qDebug() << ex.what();
             return def;
         }
     }
@@ -254,7 +257,7 @@ namespace NekoRay::sub {
                     }
                 } else if (type == "socks" || type == "http") {
                     auto bean = ent->SocksHTTPBean();
-                    bean->password = Node2QString(proxy["username"]);
+                    bean->username = Node2QString(proxy["username"]);
                     bean->password = Node2QString(proxy["password"]);
                     if (Node2Bool(proxy["tls"])) bean->stream->security = "tls";
                     if (Node2Bool(proxy["skip-cert-verify"])) bean->stream->allow_insecure = true;
@@ -403,6 +406,8 @@ namespace NekoRay::sub {
 
             content = resp.data;
             sub_user_info = NetworkRequestHelper::GetHeader(resp.header, "Subscription-UserInfo");
+
+            MW_show_log("<<<<<<<< " + QObject::tr("Subscription request fininshed: %1").arg(groupName));
         }
 
         QList<QSharedPointer<ProxyEntity>> in;         // 更新前
@@ -458,11 +463,11 @@ namespace NekoRay::sub {
 
             QString notice_added;
             for (const auto &ent: only_out) {
-                notice_added += ent->bean->DisplayTypeAndName() + "\n";
+                notice_added += "[+] " + ent->bean->DisplayTypeAndName() + "\n";
             }
             QString notice_deleted;
             for (const auto &ent: only_in) {
-                notice_deleted += ent->bean->DisplayTypeAndName() + "\n";
+                notice_deleted += "[-] " + ent->bean->DisplayTypeAndName() + "\n";
             }
 
             auto change = "\n" + QObject::tr("Added %1 profiles:\n%2\nDeleted %3 Profiles:\n%4")

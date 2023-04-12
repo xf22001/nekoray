@@ -5,11 +5,11 @@
 
 namespace NekoRay::fmt {
 
-#define DECODE_V2RAY_N_1                                                                                                     \
-    auto linkN = DecodeB64IfValid(SubStrBefore(SubStrAfter(link, "://"), "#"), QByteArray::Base64Option::Base64UrlEncoding); \
-    if (linkN.isEmpty()) return false;                                                                                       \
-    auto hasRemarks = link.contains("#");                                                                                    \
-    if (hasRemarks) linkN += "#" + SubStrAfter(link, "#");                                                                   \
+#define DECODE_V2RAY_N_1                                                                                                        \
+    QString linkN = DecodeB64IfValid(SubStrBefore(SubStrAfter(link, "://"), "#"), QByteArray::Base64Option::Base64UrlEncoding); \
+    if (linkN.isEmpty()) return false;                                                                                          \
+    auto hasRemarks = link.contains("#");                                                                                       \
+    if (hasRemarks) linkN += "#" + SubStrAfter(link, "#");                                                                      \
     auto url = QUrl("https://" + linkN);
 
     bool SocksHttpBean::TryParseLink(const QString &link) {
@@ -38,6 +38,8 @@ namespace NekoRay::fmt {
 
             stream->security = GetQueryValue(query, "security", "");
             stream->sni = GetQueryValue(query, "sni");
+
+            if (link.startsWith("https")) stream->security = "tls";
         }
         return true;
     }
@@ -53,15 +55,19 @@ namespace NekoRay::fmt {
         password = url.userName();
         if (serverPort == -1) serverPort = 443;
 
+        // security
         stream->network = GetQueryValue(query, "type", "tcp");
-        stream->security = GetQueryValue(query, "security", "tls");
+        stream->security = GetQueryValue(query, "security", "tls").replace("reality", "tls");
         auto sni1 = GetQueryValue(query, "sni");
         auto sni2 = GetQueryValue(query, "peer");
         if (!sni1.isEmpty()) stream->sni = sni1;
         if (!sni2.isEmpty()) stream->sni = sni2;
         if (!query.queryItemValue("allowInsecure").isEmpty()) stream->allow_insecure = true;
+        stream->reality_pbk = GetQueryValue(query, "pbk", "");
+        stream->reality_sid = GetQueryValue(query, "sid", "");
+        if (IS_NEKO_BOX) stream->utlsFingerprint = GetQueryValue(query, "fp", "");
 
-        // TODO header kcp quic
+        // type
         if (stream->network == "ws") {
             stream->path = GetQueryValue(query, "path", "");
             stream->host = GetQueryValue(query, "host", "");
@@ -77,6 +83,11 @@ namespace NekoRay::fmt {
             }
         }
 
+        // protocol
+        if (proxy_type == proxy_VLESS) {
+            flow = GetQueryValue(query, "flow", "");
+        }
+
         return !password.isEmpty();
     }
 
@@ -89,10 +100,20 @@ namespace NekoRay::fmt {
             name = url.fragment(QUrl::FullyDecoded);
             serverAddress = url.host();
             serverPort = url.port();
-            auto method_password = DecodeB64IfValid(url.userName(), QByteArray::Base64Option::Base64UrlEncoding);
+
+            auto urlUserName = url.userName();
+            QString method_password;
+            if (urlUserName.contains(":")) {
+                // 2022 format
+                method_password = urlUserName;
+            } else {
+                // traditional format
+                method_password = DecodeB64IfValid(urlUserName, QByteArray::Base64Option::Base64UrlEncoding);
+            }
             if (method_password.isEmpty()) return false;
             method = SubStrBefore(method_password, ":");
             password = SubStrAfter(method_password, ":");
+
             auto query = GetQuery(url);
             plugin = query.queryItemValue("plugin").replace("simple-obfs;", "obfs-local;");
         } else {
