@@ -93,7 +93,7 @@ namespace NekoRay {
         QString splitter_state = "";
 
         // Subscription
-        QString user_agent = "Nekoray/1.0 (Prefer Clash Format)";
+        QString user_agent = ""; // set at main.cpp
         bool sub_use_proxy = false;
         bool sub_clear = false;
         bool sub_insecure = false;
@@ -153,6 +153,9 @@ namespace NekoRay {
         bool core_box_auto_detect_interface = true;
         int core_box_clash_api = -9090;
         QString core_box_clash_api_secret = "";
+        QString core_box_underlying_dns = "";
+        bool core_ray_direct_dns = false;
+        bool core_ray_windows_disable_auto_interface = false;
 
         // Other Core
         ExtraCore *extraCore = new ExtraCore;

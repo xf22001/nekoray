@@ -8,7 +8,30 @@
 #include <QFile>
 #include <QFileInfo>
 
+#define BOX_UNDERLYING_DNS NekoRay::dataStore->core_box_underlying_dns.isEmpty() ? "underlying://0.0.0.0" : NekoRay::dataStore->core_box_underlying_dns
+
 namespace NekoRay {
+
+    void MergeJson(const QJsonObject &custom, QJsonObject &outbound) {
+        // 合并
+        if (custom.isEmpty()) return;
+        for (const auto &key: custom.keys()) {
+            if (outbound.contains(key)) {
+                auto v = custom[key];
+                auto v_orig = outbound[key];
+                if (v.isObject() && v_orig.isObject()) { // isObject 则合并？
+                    auto vo = v.toObject();
+                    QJsonObject vo_orig = v_orig.toObject();
+                    MergeJson(vo, vo_orig);
+                    outbound[key] = vo_orig;
+                } else {
+                    outbound[key] = v;
+                }
+            } else {
+                outbound[key] = custom[key];
+            }
+        }
+    }
 
     // Common
 
@@ -30,6 +53,9 @@ namespace NekoRay {
                 BuildConfigV2Ray(status);
             }
         }
+
+        // apply custom config
+        MergeJson(QString2QJsonObject(ent->bean->custom_config), result->coreConfig);
 
         // hook.js
         if (result->error.isEmpty() && !forTest) {
@@ -82,27 +108,6 @@ namespace NekoRay {
         }
 
         return chainTagOut;
-    }
-
-    void ApplyCustomOutboundJsonSettings(const QJsonObject &custom, QJsonObject &outbound) {
-        // 合并
-        if (custom.isEmpty()) return;
-        for (const auto &key: custom.keys()) {
-            if (outbound.contains(key)) {
-                auto v = custom[key];
-                auto v_orig = outbound[key];
-                if (v.isObject() && v_orig.isObject()) { // isObject 则合并？
-                    auto vo = v.toObject();
-                    QJsonObject vo_orig = v_orig.toObject();
-                    ApplyCustomOutboundJsonSettings(vo, vo_orig);
-                    outbound[key] = vo_orig;
-                } else {
-                    outbound[key] = v;
-                }
-            } else {
-                outbound[key] = custom[key];
-            }
-        }
     }
 
 #define DOMAIN_USER_RULE                                                             \
@@ -601,10 +606,7 @@ namespace NekoRay {
             }
 
             // apply custom outbound settings
-            auto custom_item = ent->bean->_get("custom");
-            if (custom_item != nullptr) {
-                ApplyCustomOutboundJsonSettings(QString2QJsonObject(*((QString *) custom_item->ptr)), outbound);
-            }
+            MergeJson(QString2QJsonObject(ent->bean->custom_outbound), outbound);
 
             // Bypass Lookup for the first profile
             auto serverAddress = ent->bean->serverAddress;
@@ -765,12 +767,9 @@ namespace NekoRay {
                 {"detour", tagProxy},
             };
 
-        // neko only
-        auto underlyingStr = status->forExport ? "local" : "underlying://0.0.0.0";
-
         // Direct
         auto directDNSAddress = dataStore->direct_dns;
-        if (directDNSAddress == "localhost") directDNSAddress = underlyingStr;
+        if (directDNSAddress == "localhost") directDNSAddress = BOX_UNDERLYING_DNS;
         if (!status->forTest)
             dnsServers += QJsonObject{
                 {"tag", "dns-direct"},
@@ -783,7 +782,7 @@ namespace NekoRay {
         // Underlying 100% Working DNS
         dnsServers += QJsonObject{
             {"tag", "dns-local"},
-            {"address", underlyingStr},
+            {"address", BOX_UNDERLYING_DNS},
             {"detour", "direct"},
         };
 
@@ -914,6 +913,7 @@ namespace NekoRay {
                           .replace("%STRICT_ROUTE%", dataStore->vpn_strict_route ? "true" : "false")
                           .replace("%SOCKS_USER_PASS%", socks_user_pass)
                           .replace("%FINAL_OUT%", no_match_out)
+                          .replace("%DNS_ADDRESS%", BOX_UNDERLYING_DNS)
                           .replace("%PORT%", Int2String(dataStore->inbound_socks_port));
         // hook.js
         auto source = qjs::ReadHookJS();
