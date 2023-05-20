@@ -17,6 +17,9 @@ namespace NekoRay::fmt {
         QString program;
         QStringList env;
         QStringList arguments;
+        //
+        QString tag;
+        //
         QString error;
         QString config_export;
     };
@@ -54,7 +57,7 @@ namespace NekoRay::fmt {
 
         //
 
-        virtual int NeedExternal(bool isFirstProfile, bool isVPN) { return 0; };
+        virtual int NeedExternal(bool isFirstProfile) { return 0; };
 
         virtual CoreObjOutboundBuildResult BuildCoreObjV2Ray() { return {}; };
 
@@ -63,10 +66,6 @@ namespace NekoRay::fmt {
         virtual ExternalBuildResult BuildExternal(int mapping_port, int socks_port, int external_stat) { return {}; };
 
         virtual QString ToShareLink() { return {}; };
-
-        virtual QString InsecureHint() { return {}; };
-
-        QString DisplayInsecureHint();
     };
 
 } // namespace NekoRay::fmt

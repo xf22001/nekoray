@@ -170,7 +170,6 @@ set(PROJECT_SOURCES
         fmt/Bean2CoreObj_box.cpp
         fmt/Bean2External.cpp
         fmt/Bean2Link.cpp
-        fmt/InsecureHint.cpp
         fmt/Link2Bean.cpp
         fmt/ChainBean.hpp # translate
 
@@ -213,6 +212,10 @@ set(PROJECT_SOURCES
         ui/edit/edit_naive.h
         ui/edit/edit_naive.cpp
         ui/edit/edit_naive.ui
+
+        ui/edit/edit_hysteria.h
+        ui/edit/edit_hysteria.cpp
+        ui/edit/edit_hysteria.ui
 
         ui/edit/edit_custom.h
         ui/edit/edit_custom.cpp

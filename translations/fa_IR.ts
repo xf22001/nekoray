@@ -92,17 +92,9 @@
         <translation>استفاده از پروکسی زمانی که اشتراک را بروزرسانی می کنید</translation>
     </message>
     <message>
-        <source>Language</source>
-        <translation type="vanished">زبان</translation>
-    </message>
-    <message>
         <source>Security</source>
         <translatorcomment>امنیت security</translatorcomment>
         <translation>امنیت</translation>
-    </message>
-    <message>
-        <source>Insecure hint</source>
-        <translation>اشاره ناامن</translation>
     </message>
     <message>
         <source>Statistics refresh rate</source>
@@ -243,6 +235,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
         <source>If you VPN mode is not working, try to change this option.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Default On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiplex (mux)</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogEditGroup</name>
@@ -358,10 +358,6 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
         <translation>تنظیمات شبکه (1%)</translation>
     </message>
     <message>
-        <source>Security Settings</source>
-        <translation type="vanished">تنظیمات امنیت</translation>
-    </message>
-    <message>
         <source>When enabled, V2Ray will not check the validity of the TLS certificate provided by the remote host (the security is equivalent to plaintext)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -419,6 +415,30 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     </message>
     <message>
         <source>Custom Config Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Apply settings to this group</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Multiplex</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Keep Default</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>On</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">خاموش</translation>
+    </message>
+    <message>
+        <source>Confirm</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -504,14 +524,6 @@ These settings can be changed later.</source>
         <translation>غیرفعال کردن</translation>
     </message>
     <message>
-        <source>The sniffing result is used for routing</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>The sniffing result is used for destination</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Remote DNS</source>
         <translation type="unfinished"></translation>
     </message>
@@ -522,14 +534,6 @@ These settings can be changed later.</source>
     <message>
         <source>Enable DNS Routing</source>
         <translation>فعال کردن مسیریابی DNS</translation>
-    </message>
-    <message>
-        <source>V2Ray Domain Strategy</source>
-        <translation>استراتژی دامنه</translation>
-    </message>
-    <message>
-        <source>Matcher</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Block</source>
@@ -554,14 +558,6 @@ These settings can be changed later.</source>
     <message>
         <source>Preset</source>
         <translation>پیشفرض</translation>
-    </message>
-    <message>
-        <source>Custom</source>
-        <translation>سفارشی</translation>
-    </message>
-    <message>
-        <source>Custom (global)</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>Mange route set</source>
@@ -608,15 +604,71 @@ These settings can be changed later.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
+        <source>Domain Strategy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server Address Strategy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sniff result for routing</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Sniff result for destination</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation type="unfinished">متداول</translation>
+    </message>
+    <message>
+        <source>DNS</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple DNS Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Use DNS Object</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>DNS Object Settings</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Simple Route</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Route</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Custom Route (global)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Note: Other settings are independent for each route set.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Route sets</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
         <source>Query Strategy</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Remote</source>
-        <translation type="unfinished"></translation>
+        <source>Document</source>
+        <translation type="unfinished">اسناد</translation>
     </message>
     <message>
-        <source>Inbound &amp; Outbound Domain Strategy</source>
+        <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -625,10 +677,6 @@ These settings can be changed later.</source>
     <message>
         <source>VPN Settings</source>
         <translation>تنظیمات vpn</translation>
-    </message>
-    <message>
-        <source>VPN Implementation</source>
-        <translation>پیاده سازی VPN</translation>
     </message>
     <message>
         <source>Hide Console</source>
@@ -682,11 +730,12 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</source>
         <translation type="unfinished">لغو کردن</translation>
     </message>
     <message>
-        <source>Don&apos;t ask for privilege elevation</source>
+        <source>Internal Tun</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Already Admin</source>
+        <source>Add a tun inbound to the profile startup, instead of using two processes.
+This needs to be run NekoBox with administrator privileges.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -720,10 +769,6 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please read the documentation. If you don&apos;t understand, use a share link instead.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Outbound JSON, please read the documentation.</source>
         <translation>JSON خروجی، لطفاً مستندات را بخوانید.</translation>
     </message>
@@ -749,6 +794,57 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</source>
     </message>
     <message>
         <source>Please fill the complete config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>EditHysteria</name>
+    <message>
+        <source>Certificate</source>
+        <translation type="unfinished">گواهی</translation>
+    </message>
+    <message>
+        <source>Auth Type</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Protocol</source>
+        <translation type="unfinished">پروتکل</translation>
+    </message>
+    <message>
+        <source>Download (Mbps)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Disable MTU Discovery</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hop Interval (s)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Allow Insecure</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Hop Port</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Upload (Mbps)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Obfs Password</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>SNI</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Auth Payload</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1290,14 +1386,6 @@ Split by line.</source>
         <translation>پاک کردن</translation>
     </message>
     <message>
-        <source>End</source>
-        <translation type="vanished">پایان</translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation type="vanished">فعال</translation>
-    </message>
-    <message>
         <source>Start: %1
 End: %2</source>
         <translation type="unfinished"></translation>
@@ -1327,10 +1415,6 @@ End: %2</source>
         <translation>اغاز پروفایل %1</translation>
     </message>
     <message>
-        <source>Profile is insecure: %1</source>
-        <translation>پروفایل ناامن می باشد: %1</translation>
-    </message>
-    <message>
         <source>Stopping profile %1</source>
         <translation>متوقف کردن پروفایل %1</translation>
     </message>
@@ -1358,13 +1442,29 @@ End: %2</source>
         <source>Restart nekoray to take effect.</source>
         <translation type="unfinished">برای اعمال تغییرات nekoray را مجددا راه اندازی کنید.</translation>
     </message>
+    <message>
+        <source>Please run NekoBox as admin</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart Proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>If there is no response for a long time, it is recommended to restart the software.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to start profile %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Failed to stop, please restart the program.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>ProxyItem</name>
-    <message>
-        <source>Remove</source>
-        <translation type="vanished">حذف کردن</translation>
-    </message>
     <message>
         <source>Confirmation</source>
         <translation>تائیدیه</translation>
@@ -1466,26 +1566,6 @@ Deleted %3 Profiles:
         <translation>پروکسی زنجیره ای</translation>
     </message>
     <message>
-        <source>The configuration (insecure) can be detected and identified, the transmission is fully visible to the censor and is not resistant to man-in-the-middle tampering with the content of the communication.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This configuration (Shadowsocks streaming cipher) can be accurately proactively detected and decrypted by censors without requiring a password, and cannot be mitigated by turning on IV replay filters on the server side.
-
-Learn more: https://github.com/net4people/bbs/issues/24</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This profile is cleartext, don&apos;t use it if the server is not in your local network.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
-        <source>This configuration (VMess MD5 authentication) has been deprecated by upstream because of its questionable resistance to tampering and concealment.
-
-As of January 1, 2022, compatibility with MD5 authentication information will be disabled on the server side by default. Any client using MD5 authentication information will not be able to connect to a server with VMess MD5 authentication information disabled.</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Core not found: %1</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1512,6 +1592,14 @@ Direct: %2</source>
     </message>
     <message>
         <source>Subscription request fininshed: %1</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Core exited, restarting.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Core exits too frequently, stop automatic restart this profile.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

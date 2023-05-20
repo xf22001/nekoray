@@ -9,6 +9,12 @@
 #include <QJsonArray>
 #include <QJsonDocument>
 
+#ifdef Q_OS_WIN
+#include "sys/windows/guihelper.h"
+#else
+#include <unistd.h>
+#endif
+
 namespace NekoRay {
 
     DataStore *dataStore = new DataStore();
@@ -26,17 +32,10 @@ namespace NekoRay {
         _add(new configItem("inbound_socks_port", &inbound_socks_port, itemType::integer));
         _add(new configItem("inbound_http_port", &inbound_http_port, itemType::integer));
         _add(new configItem("log_level", &log_level, itemType::string));
-        _add(new configItem("remote_dns", &remote_dns, itemType::string));
-        _add(new configItem("remote_dns_strategy", &remote_dns_strategy, itemType::string));
-        _add(new configItem("direct_dns", &direct_dns, itemType::string));
-        _add(new configItem("direct_dns_strategy", &direct_dns_strategy, itemType::string));
-        _add(new configItem("domain_matcher", &domain_matcher, itemType::integer));
-        _add(new configItem("domain_strategy", &domain_strategy, itemType::string));
-        _add(new configItem("outbound_domain_strategy", &outbound_domain_strategy, itemType::string));
-        _add(new configItem("sniffing_mode", &sniffing_mode, itemType::integer));
-        _add(new configItem("mux_cool", &mux_cool, itemType::integer));
+        _add(new configItem("mux_protocol", &mux_protocol, itemType::string));
+        _add(new configItem("mux_concurrency", &mux_concurrency, itemType::integer));
+        _add(new configItem("mux_default_on", &mux_default_on, itemType::boolean));
         _add(new configItem("traffic_loop_interval", &traffic_loop_interval, itemType::integer));
-        _add(new configItem("dns_routing", &dns_routing, itemType::boolean));
         _add(new configItem("test_concurrent", &test_concurrent, itemType::integer));
         _add(new configItem("theme", &theme, itemType::string));
         _add(new configItem("custom_inbound", &custom_inbound, itemType::string));
@@ -46,8 +45,7 @@ namespace NekoRay {
         _add(new configItem("remember_id", &remember_id, itemType::integer));
         _add(new configItem("remember_enable", &remember_enable, itemType::boolean));
         _add(new configItem("language", &language, itemType::integer));
-        _add(new configItem("spmode", &remember_spmode, itemType::integer));
-        _add(new configItem("insecure_hint", &insecure_hint, itemType::boolean));
+        _add(new configItem("spmode2", &remember_spmode, itemType::stringList));
         _add(new configItem("skip_cert", &skip_cert, itemType::boolean));
         _add(new configItem("hk_mw", &hotkey_mainwindow, itemType::string));
         _add(new configItem("hk_group", &hotkey_group, itemType::string));
@@ -75,14 +73,13 @@ namespace NekoRay {
         _add(new configItem("max_log_line", &max_log_line, itemType::integer));
         _add(new configItem("splitter_state", &splitter_state, itemType::string));
         _add(new configItem("utlsFingerprint", &utlsFingerprint, itemType::string));
-        _add(new configItem("core_box_auto_detect_interface", &core_box_auto_detect_interface, itemType::boolean));
         _add(new configItem("core_box_clash_api", &core_box_clash_api, itemType::integer));
         _add(new configItem("core_box_clash_api_secret", &core_box_clash_api_secret, itemType::string));
         _add(new configItem("core_box_underlying_dns", &core_box_underlying_dns, itemType::string));
         _add(new configItem("core_ray_direct_dns", &core_ray_direct_dns, itemType::boolean));
-#ifndef Q_OS_WIN
+        _add(new configItem("vpn_internal_tun", &vpn_internal_tun, itemType::boolean));
+#ifdef Q_OS_WIN
         _add(new configItem("core_ray_windows_disable_auto_interface", &core_ray_windows_disable_auto_interface, itemType::boolean));
-        _add(new configItem("vpn_already_admin", &vpn_already_admin, itemType::boolean));
 #endif
     }
 
@@ -123,16 +120,29 @@ namespace NekoRay {
         _add(new configItem("block_domain", &this->block_domain, itemType::string));
         _add(new configItem("def_outbound", &this->def_outbound, itemType::string));
         _add(new configItem("custom", &this->custom, itemType::string));
+        //
+        _add(new configItem("remote_dns", &this->remote_dns, itemType::string));
+        _add(new configItem("remote_dns_strategy", &this->remote_dns_strategy, itemType::string));
+        _add(new configItem("direct_dns", &this->direct_dns, itemType::string));
+        _add(new configItem("direct_dns_strategy", &this->direct_dns_strategy, itemType::string));
+        _add(new configItem("domain_strategy", &this->domain_strategy, itemType::string));
+        _add(new configItem("outbound_domain_strategy", &this->outbound_domain_strategy, itemType::string));
+        _add(new configItem("dns_routing", &this->dns_routing, itemType::boolean));
+        _add(new configItem("sniffing_mode", &this->sniffing_mode, itemType::integer));
+        _add(new configItem("use_dns_object", &this->use_dns_object, itemType::boolean));
+        _add(new configItem("dns_object", &this->dns_object, itemType::string));
     }
 
     QString Routing::DisplayRouting() const {
-        return QString("[Proxy] %1\n[Proxy] %2\n[Direct] %3\n[Direct] %4\n[Block] %5\n[Block] %6")
+        return QString("[Proxy] %1\n[Proxy] %2\n[Direct] %3\n[Direct] %4\n[Block] %5\n[Block] %6\n[Default Outbound] %7\n[DNS] %8")
             .arg(SplitLinesSkipSharp(proxy_domain).join(","))
             .arg(SplitLinesSkipSharp(proxy_ip).join(","))
             .arg(SplitLinesSkipSharp(direct_domain).join(","))
             .arg(SplitLinesSkipSharp(direct_ip).join(","))
             .arg(SplitLinesSkipSharp(block_domain).join(","))
-            .arg(SplitLinesSkipSharp(block_ip).join(","));
+            .arg(SplitLinesSkipSharp(block_ip).join(","))
+            .arg(def_outbound)
+            .arg(use_dns_object ? "DNS Object" : "Simple DNS");
     }
 
     QStringList Routing::List() {
@@ -192,12 +202,44 @@ namespace NekoRay {
         _map.insert(item->name, QSharedPointer<configItem>(item));
     }
 
+    QString JsonStore::_name(void *p) {
+        for (const auto &_item: _map) {
+            if (_item->ptr == p) return _item->name;
+        }
+        return {};
+    }
+
     QSharedPointer<configItem> JsonStore::_get(const QString &name) {
         // 直接 [] 会设置一个 nullptr ，所以先判断是否存在
         if (_map.contains(name)) {
             return _map[name];
         }
         return nullptr;
+    }
+
+    void JsonStore::_setValue(const QString &name, void *p) {
+        auto item = _get(name);
+        if (item == nullptr) return;
+
+        switch (item->type) {
+            case NekoRay::itemType::string:
+                *(QString *) item->ptr = *(QString *) p;
+                break;
+            case NekoRay::itemType::boolean:
+                *(bool *) item->ptr = *(bool *) p;
+                break;
+            case NekoRay::itemType::integer:
+                *(int *) item->ptr = *(int *) p;
+                break;
+            case NekoRay::itemType::integer64:
+                *(long long *) item->ptr = *(long long *) p;
+                break;
+            // others...
+            case stringList:
+            case integerList:
+            case jsonStore:
+                break;
+        }
     }
 
     QJsonObject JsonStore::ToJson() {
@@ -317,6 +359,7 @@ namespace NekoRay {
 
     bool JsonStore::Save() {
         if (callback_before_save != nullptr) callback_before_save();
+        if (save_control_no_save) return false;
 
         auto save_content = ToJsonBytes();
         auto changed = last_save_content != save_content;
@@ -373,5 +416,21 @@ namespace NekoRay {
         }
         return {};
     }
+
+    short isAdminCache = -1;
+
+    bool isAdmin() {
+        if (isAdminCache >= 0) return isAdminCache;
+
+        auto admin = NekoRay::dataStore->flag_linux_run_core_as_admin;
+#ifdef Q_OS_WIN
+        admin = Windows_IsInAdmin();
+#else
+        admin |= geteuid() == 0;
+#endif
+
+        isAdminCache = admin;
+        return admin;
+    };
 
 } // namespace NekoRay

@@ -23,7 +23,14 @@ inline std::function<void(QString, QString)> MW_show_log_ext;
 inline std::function<void(QString)> MW_show_log_ext_vt100;
 inline std::function<void(QString, QString)> MW_dialog_message;
 
+// Dispatchers
+
+class QThread;
+inline QThread *DS_cores;
+
 // String
+
+#define FIRST_OR_SECOND(a, b) a.isEmpty() ? b : a
 
 inline const QString UNICODE_LRO = QString::fromUtf8(QByteArray::fromHex("E280AD"));
 
