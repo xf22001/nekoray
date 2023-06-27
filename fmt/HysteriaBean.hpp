@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoRay::fmt {
+namespace NekoGui_fmt {
     class HysteriaBean : public AbstractBean {
     public:
         static constexpr int hysteria_protocol_udp = 0;
@@ -63,7 +63,7 @@ namespace NekoRay::fmt {
             return ::DisplayAddress(serverAddress, serverPort);
         }
 
-        QString DisplayCoreType() override { return NeedExternal(false) == 0 ? software_core_name : "Hysteria"; };
+        QString DisplayCoreType() override { return NeedExternal(true) == 0 ? software_core_name : "Hysteria"; };
 
         QString DisplayType() override { return "Hysteria"; };
 
@@ -77,4 +77,4 @@ namespace NekoRay::fmt {
 
         QString ToShareLink() override;
     };
-} // namespace NekoRay::fmt
+} // namespace NekoGui_fmt

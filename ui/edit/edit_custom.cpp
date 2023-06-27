@@ -28,17 +28,17 @@ EditCustom::~EditCustom() {
 #define SAVE_CUSTOM_BEAN                            \
     P_SAVE_COMBO_STRING(core)                       \
     bean->command = ui->command->text().split(" "); \
-    P_SAVE_STRING_QTEXTEDIT(config_simple)          \
+    P_SAVE_STRING_PLAIN(config_simple)              \
     P_SAVE_COMBO_STRING(config_suffix)              \
     P_SAVE_INT(mapping_port)                        \
     P_SAVE_INT(socks_port)
 
-void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
+void EditCustom::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->CustomBean();
 
     // load known core
-    auto core_map = QString2QJsonObject(NekoRay::dataStore->extraCore->core_map);
+    auto core_map = QString2QJsonObject(NekoGui::dataStore->extraCore->core_map);
     for (const auto &key: core_map.keys()) {
         if (key == "naive" || key == "hysteria") continue;
         ui->core->addItem(key);
@@ -62,7 +62,7 @@ void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
     // load core ui
     P_LOAD_COMBO_STRING(core)
     ui->command->setText(bean->command.join(" "));
-    P_LOAD_STRING(config_simple)
+    ui->config_simple->setPlainText(bean->config_simple);
     P_LOAD_COMBO_STRING(config_suffix)
     P_LOAD_INT(mapping_port)
     P_LOAD_INT(socks_port)
@@ -75,7 +75,7 @@ void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
         ui->core->setDisabled(true);
         ui->core->setCurrentText(preset_core);
         ui->command->setText(preset_command);
-        ui->config_simple->setText(preset_config);
+        ui->config_simple->setPlainText(preset_config);
     }
 
     // custom internal
@@ -102,7 +102,7 @@ void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
         th << "%server_port% => " + get_edit_text_serverPort();
         MessageBoxInfo(tr("Preview replace"), th.join("\n"));
         // EditCustom::onEnd
-        auto tmpEnt = NekoRay::ProfileManager::NewProxyEntity("custom");
+        auto tmpEnt = NekoGui::ProfileManager::NewProxyEntity("custom");
         auto bean = tmpEnt->CustomBean();
         SAVE_CUSTOM_BEAN
         // 补充
@@ -110,7 +110,7 @@ void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
         bean->serverPort = get_edit_text_serverPort().toInt();
         if (bean->core.isEmpty()) return;
         //
-        auto result = NekoRay::BuildConfig(tmpEnt, false, false);
+        auto result = NekoGui::BuildConfig(tmpEnt, false, false);
         if (!result->error.isEmpty()) {
             MessageBoxInfo(software_name, result->error);
             return;
@@ -129,14 +129,18 @@ void EditCustom::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
 }
 
 bool EditCustom::onEnd() {
-    auto bean = this->ent->CustomBean();
-
-    SAVE_CUSTOM_BEAN
-
-    if (bean->core.isEmpty()) {
+    if (get_edit_text_name().isEmpty()) {
+        MessageBoxWarning(software_name, tr("Name cannot be empty."));
+        return false;
+    }
+    if (ui->core->currentText().isEmpty()) {
         MessageBoxWarning(software_name, tr("Please pick a core."));
         return false;
     }
+
+    auto bean = this->ent->CustomBean();
+
+    SAVE_CUSTOM_BEAN
 
     return true;
 }
@@ -145,6 +149,6 @@ void EditCustom::on_as_json_clicked() {
     auto editor = new JsonEditor(QString2QJsonObject(ui->config_simple->toPlainText()), this);
     auto result = editor->OpenEditor();
     if (!result.isEmpty()) {
-        ui->config_simple->setText(QJsonObject2QString(result, false));
+        ui->config_simple->setPlainText(QJsonObject2QString(result, false));
     }
 }

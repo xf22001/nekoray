@@ -15,7 +15,7 @@ EditChain::~EditChain() {
     delete ui;
 }
 
-void EditChain::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
+void EditChain::onStart(std::shared_ptr<NekoGui::ProxyEntity> _ent) {
     this->ent = _ent;
     auto bean = this->ent->ChainBean();
 
@@ -25,6 +25,11 @@ void EditChain::onStart(QSharedPointer<NekoRay::ProxyEntity> _ent) {
 }
 
 bool EditChain::onEnd() {
+    if (get_edit_text_name().isEmpty()) {
+        MessageBoxWarning(software_name, tr("Name cannot be empty."));
+        return false;
+    }
+
     auto bean = this->ent->ChainBean();
 
     QList<int> idList;
@@ -45,7 +50,7 @@ void EditChain::on_select_profile_clicked() {
 }
 
 void EditChain::AddProfileToListIfExist(int profileId) {
-    auto _ent = NekoRay::profileManager->GetProfile(profileId);
+    auto _ent = NekoGui::profileManager->GetProfile(profileId);
     if (_ent != nullptr && _ent->type != "chain") {
         auto wI = new QListWidgetItem();
         wI->setData(114514, profileId);
@@ -64,7 +69,7 @@ void EditChain::AddProfileToListIfExist(int profileId) {
 }
 
 void EditChain::ReplaceProfile(ProxyItem *w, int profileId) {
-    auto _ent = NekoRay::profileManager->GetProfile(profileId);
+    auto _ent = NekoGui::profileManager->GetProfile(profileId);
     if (_ent != nullptr && _ent->type != "chain") {
         w->item->setData(114514, profileId);
         w->ent = _ent;

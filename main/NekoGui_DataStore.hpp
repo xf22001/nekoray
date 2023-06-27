@@ -1,6 +1,6 @@
 // DO NOT INCLUDE THIS
 
-namespace NekoRay {
+namespace NekoGui {
 
     class Routing : public JsonStore {
     public:
@@ -92,9 +92,10 @@ namespace NekoRay {
 
         // Misc
         QString log_level = "warning";
-        QString test_url = "http://cp.cloudflare.com/";
+        QString test_latency_url = "http://cp.cloudflare.com/";
+        QString test_download_url = "http://cachefly.cachefly.net/10mb.test";
         int test_concurrent = 5;
-        int traffic_loop_interval = 500;
+        int traffic_loop_interval = 1000;
         bool connection_statistics = false;
         int current_group = 0; // group id
         QString mux_protocol = "";
@@ -162,6 +163,7 @@ namespace NekoRay {
         QString core_box_underlying_dns = "";
         bool core_ray_direct_dns = false;
         bool core_ray_windows_disable_auto_interface = false;
+        QString core_ray_freedom_domainStrategy = "";
 
         // Other Core
         ExtraCore *extraCore = new ExtraCore;
@@ -175,4 +177,4 @@ namespace NekoRay {
 
     extern DataStore *dataStore;
 
-} // namespace NekoRay
+} // namespace NekoGui

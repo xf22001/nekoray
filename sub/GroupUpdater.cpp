@@ -16,18 +16,18 @@
 
 #endif
 
-namespace NekoRay::sub {
+namespace NekoGui_sub {
 
     GroupUpdater *groupUpdater = new GroupUpdater;
 
-    void RawUpdater_FixEnt(const QSharedPointer<ProxyEntity> &ent) {
+    void RawUpdater_FixEnt(const std::shared_ptr<NekoGui::ProxyEntity> &ent) {
         if (ent == nullptr) return;
-        auto stream = fmt::GetStreamSettings(ent->bean.get());
+        auto stream = NekoGui_fmt::GetStreamSettings(ent->bean.get());
         if (stream == nullptr) return;
         // 1. "security"
         if (stream->security == "none" || stream->security == "0" || stream->security == "false") {
             stream->security = "";
-        } else if (stream->security == "xtls" || stream->security == "1" || stream->security == "true") {
+        } else if (stream->security == "1" || stream->security == "true") {
             stream->security = "tls";
         }
         // 2. TLS SNI: v2rayN config builder generate sni like this, so set sni here for their format.
@@ -58,7 +58,7 @@ namespace NekoRay::sub {
             return;
         }
 
-        QSharedPointer<ProxyEntity> ent;
+        std::shared_ptr<NekoGui::ProxyEntity> ent;
         bool needFix = true;
 
         // Nekoray format
@@ -66,7 +66,7 @@ namespace NekoRay::sub {
             needFix = false;
             auto link = QUrl(str);
             if (!link.isValid()) return;
-            ent = ProfileManager::NewProxyEntity(link.host());
+            ent = NekoGui::ProfileManager::NewProxyEntity(link.host());
             if (ent->bean->version == -114514) return;
             auto j = DecodeB64IfValid(link.fragment().toUtf8(), QByteArray::Base64UrlEncoding);
             if (j.isEmpty()) return;
@@ -77,42 +77,42 @@ namespace NekoRay::sub {
         // SOCKS
         if (str.startsWith("socks5://") || str.startsWith("socks4://") ||
             str.startsWith("socks4a://") || str.startsWith("socks://")) {
-            ent = ProfileManager::NewProxyEntity("socks");
+            ent = NekoGui::ProfileManager::NewProxyEntity("socks");
             auto ok = ent->SocksHTTPBean()->TryParseLink(str);
             if (!ok) return;
         }
 
         // HTTP
         if (str.startsWith("http://") || str.startsWith("https://")) {
-            ent = ProfileManager::NewProxyEntity("http");
+            ent = NekoGui::ProfileManager::NewProxyEntity("http");
             auto ok = ent->SocksHTTPBean()->TryParseLink(str);
             if (!ok) return;
         }
 
         // ShadowSocks
         if (str.startsWith("ss://")) {
-            ent = ProfileManager::NewProxyEntity("shadowsocks");
+            ent = NekoGui::ProfileManager::NewProxyEntity("shadowsocks");
             auto ok = ent->ShadowSocksBean()->TryParseLink(str);
             if (!ok) return;
         }
 
         // VMess
         if (str.startsWith("vmess://")) {
-            ent = ProfileManager::NewProxyEntity("vmess");
+            ent = NekoGui::ProfileManager::NewProxyEntity("vmess");
             auto ok = ent->VMessBean()->TryParseLink(str);
             if (!ok) return;
         }
 
         // VLESS
         if (str.startsWith("vless://")) {
-            ent = ProfileManager::NewProxyEntity("vless");
+            ent = NekoGui::ProfileManager::NewProxyEntity("vless");
             auto ok = ent->TrojanVLESSBean()->TryParseLink(str);
             if (!ok) return;
         }
 
         // Trojan
         if (str.startsWith("trojan://")) {
-            ent = ProfileManager::NewProxyEntity("trojan");
+            ent = NekoGui::ProfileManager::NewProxyEntity("trojan");
             auto ok = ent->TrojanVLESSBean()->TryParseLink(str);
             if (!ok) return;
         }
@@ -120,7 +120,7 @@ namespace NekoRay::sub {
         // Naive
         if (str.startsWith("naive+")) {
             needFix = false;
-            ent = ProfileManager::NewProxyEntity("naive");
+            ent = NekoGui::ProfileManager::NewProxyEntity("naive");
             auto ok = ent->NaiveBean()->TryParseLink(str);
             if (!ok) return;
         }
@@ -128,7 +128,7 @@ namespace NekoRay::sub {
         // Hysteria
         if (str.startsWith("hysteria://")) {
             needFix = false;
-            ent = ProfileManager::NewProxyEntity("hysteria");
+            ent = NekoGui::ProfileManager::NewProxyEntity("hysteria");
             auto ok = ent->HysteriaBean()->TryParseLink(str);
             if (!ok) return;
         }
@@ -139,7 +139,7 @@ namespace NekoRay::sub {
         if (needFix) RawUpdater_FixEnt(ent);
 
         // End
-        profileManager->AddProfile(ent, gid_add_to);
+        NekoGui::profileManager->AddProfile(ent, gid_add_to);
         update_counter++;
     }
 
@@ -217,7 +217,7 @@ namespace NekoRay::sub {
                 if (type == "ss" || type == "ssr") type = "shadowsocks";
                 if (type == "socks5") type = "socks";
 
-                auto ent = ProfileManager::NewProxyEntity(type);
+                auto ent = NekoGui::ProfileManager::NewProxyEntity(type);
                 if (ent->bean->version == -114514) continue;
                 bool needFix = false;
 
@@ -270,6 +270,13 @@ namespace NekoRay::sub {
                     if (type == "vless") {
                         bean->flow = Node2QString(proxy["flow"]);
                         bean->password = Node2QString(proxy["uuid"]);
+                        // meta vless xudp
+                        auto xudp = proxy["xudp"];
+                        if (xudp.IsDefined() && !xudp.IsNull() && Node2Bool(xudp) == false) {
+                            bean->stream->packet_encoding = "";
+                        } else {
+                            bean->stream->packet_encoding = "xudp";
+                        }
                     } else {
                         bean->password = Node2QString(proxy["password"]);
                     }
@@ -289,6 +296,8 @@ namespace NekoRay::sub {
                             }
                         }
                         bean->stream->path = Node2QString(ws["path"]);
+                        bean->stream->ws_early_data_length = Node2Int(ws["max-early-data"]);
+                        bean->stream->ws_early_data_name = Node2QString(ws["early-data-header-name"]);
                     }
 
                     auto grpc = NodeChild(proxy, {"grpc-opts", "grpc-opt"});
@@ -322,6 +331,8 @@ namespace NekoRay::sub {
                             }
                         }
                         bean->stream->path = Node2QString(ws["path"]);
+                        bean->stream->ws_early_data_length = Node2Int(ws["max-early-data"]);
+                        bean->stream->ws_early_data_name = Node2QString(ws["early-data-header-name"]);
                     }
 
                     auto grpc = NodeChild(proxy, {"grpc-opts", "grpc-opt"});
@@ -372,13 +383,14 @@ namespace NekoRay::sub {
                     auto auth_str = FIRST_OR_SECOND(Node2QString(proxy["auth_str"]), Node2QString(proxy["auth-str"]));
                     auto auth = Node2QString(proxy["auth"]);
                     if (!auth_str.isEmpty()) {
-                        bean->authPayloadType = fmt::HysteriaBean::hysteria_auth_string;
+                        bean->authPayloadType = NekoGui_fmt::HysteriaBean::hysteria_auth_string;
                         bean->authPayload = auth_str;
                     }
                     if (!auth.isEmpty()) {
-                        bean->authPayloadType = fmt::HysteriaBean::hysteria_auth_base64;
+                        bean->authPayloadType = NekoGui_fmt::HysteriaBean::hysteria_auth_base64;
                         bean->authPayload = auth;
                     }
+                    bean->obfsPassword = Node2QString(proxy["obfs"]);
 
                     if (Node2Bool(proxy["disable_mtu_discovery"]) || Node2Bool(proxy["disable-mtu-discovery"])) bean->disableMtuDiscovery = true;
                     bean->streamReceiveWindow = Node2Int(proxy["recv-window"]);
@@ -393,7 +405,7 @@ namespace NekoRay::sub {
                 }
 
                 if (needFix) RawUpdater_FixEnt(ent);
-                profileManager->AddProfile(ent, gid_add_to);
+                NekoGui::profileManager->AddProfile(ent, gid_add_to);
                 update_counter++;
             }
         } catch (const YAML::Exception &ex) {
@@ -408,28 +420,43 @@ namespace NekoRay::sub {
     void GroupUpdater::AsyncUpdate(const QString &str, int _sub_gid, const std::function<void()> &finish) {
         auto content = str.trimmed();
         bool asURL = false;
+        bool createNewGroup = false;
 
         if (_sub_gid < 0 && (content.startsWith("http://") || content.startsWith("https://"))) {
-            auto items = QStringList{QObject::tr("As Subscription"), QObject::tr("As link")};
+            auto items = QStringList{
+                QObject::tr("As Subscription (add to this group)"),
+                QObject::tr("As Subscription (create new group)"),
+                QObject::tr("As link"),
+            };
             bool ok;
             auto a = QInputDialog::getItem(nullptr,
                                            QObject::tr("url detected"),
                                            QObject::tr("%1\nHow to update?").arg(content),
                                            items, 0, false, &ok);
             if (!ok) return;
-            if (items.indexOf(a) == 0) asURL = true;
+            if (items.indexOf(a) <= 1) asURL = true;
+            if (items.indexOf(a) == 1) createNewGroup = true;
         }
 
         runOnNewThread([=] {
-            Update(str, _sub_gid, asURL);
-            emit asyncUpdateCallback(_sub_gid);
+            auto gid = _sub_gid;
+            if (createNewGroup) {
+                auto group = NekoGui::ProfileManager::NewGroup();
+                group->name = QUrl(str).host();
+                group->url = str;
+                NekoGui::profileManager->AddGroup(group);
+                gid = group->id;
+                MW_dialog_message("SubUpdater", "NewGroup");
+            }
+            Update(str, gid, asURL);
+            emit asyncUpdateCallback(gid);
             if (finish != nullptr) finish();
         });
     }
 
     void GroupUpdater::Update(const QString &_str, int _sub_gid, bool _not_sub_as_url) {
         // 创建 rawUpdater
-        NekoRay::dataStore->imported_count = 0;
+        NekoGui::dataStore->imported_count = 0;
         auto rawUpdater = std::make_unique<RawUpdater>();
         rawUpdater->gid_add_to = _sub_gid;
 
@@ -437,7 +464,7 @@ namespace NekoRay::sub {
         QString sub_user_info;
         bool asURL = _sub_gid >= 0 || _not_sub_as_url; // 把 _str 当作 url 处理（下载内容）
         auto content = _str.trimmed();
-        auto group = profileManager->GetGroup(_sub_gid);
+        auto group = NekoGui::profileManager->GetGroup(_sub_gid);
         if (group != nullptr && group->archive) return;
 
         // 网络请求
@@ -457,25 +484,25 @@ namespace NekoRay::sub {
             MW_show_log("<<<<<<<< " + QObject::tr("Subscription request fininshed: %1").arg(groupName));
         }
 
-        QList<QSharedPointer<ProxyEntity>> in;         // 更新前
-        QList<QSharedPointer<ProxyEntity>> out_all;    // 更新前 + 更新后
-        QList<QSharedPointer<ProxyEntity>> out;        // 更新后
-        QList<QSharedPointer<ProxyEntity>> only_in;    // 只在更新前有的
-        QList<QSharedPointer<ProxyEntity>> only_out;   // 只在更新后有的
-        QList<QSharedPointer<ProxyEntity>> update_del; // 更新前后都有的，删除更新后多余的
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> in;         // 更新前
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> out_all;    // 更新前 + 更新后
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> out;        // 更新后
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> only_in;    // 只在更新前有的
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> only_out;   // 只在更新后有的
+        QList<std::shared_ptr<NekoGui::ProxyEntity>> update_del; // 更新前后都有的，删除更新后多余的
 
         // 订阅解析前
         if (group != nullptr) {
             in = group->Profiles();
-            group->last_update = QDateTime::currentSecsSinceEpoch();
+            group->sub_last_update = QDateTime::currentMSecsSinceEpoch() / 1000;
             group->info = sub_user_info;
             group->order.clear();
             group->Save();
             //
-            if (dataStore->sub_clear) {
+            if (NekoGui::dataStore->sub_clear) {
                 MW_show_log(QObject::tr("Clearing servers..."));
                 for (const auto &profile: in) {
-                    profileManager->DeleteProfile(profile->id);
+                    NekoGui::profileManager->DeleteProfile(profile->id);
                 }
             }
         }
@@ -497,15 +524,15 @@ namespace NekoRay::sub {
         if (group != nullptr) {
             out_all = group->Profiles();
 
-            ProfileFilter::OnlyInSrc_ByPointer(out_all, in, out);
-            ProfileFilter::OnlyInSrc(in, out, only_in);
-            ProfileFilter::OnlyInSrc(out, in, only_out);
-            ProfileFilter::Common(in, out, update_del, false, true);
+            NekoGui::ProfileFilter::OnlyInSrc_ByPointer(out_all, in, out);
+            NekoGui::ProfileFilter::OnlyInSrc(in, out, only_in);
+            NekoGui::ProfileFilter::OnlyInSrc(out, in, only_out);
+            NekoGui::ProfileFilter::Common(in, out, update_del, false, true);
             update_del += only_in;
-            if (dataStore->sub_clear) update_del = {};
+            if (NekoGui::dataStore->sub_clear) update_del = {};
 
             for (const auto &ent: update_del) {
-                profileManager->DeleteProfile(ent->id);
+                NekoGui::profileManager->DeleteProfile(ent->id);
             }
 
             QString notice_added;
@@ -526,8 +553,8 @@ namespace NekoRay::sub {
             MW_show_log("<<<<<<<< " + QObject::tr("Change of %1:").arg(group->name) + " " + change);
             MW_dialog_message("SubUpdater", "finish-dingyue");
         } else {
-            NekoRay::dataStore->imported_count = rawUpdater->update_counter;
+            NekoGui::dataStore->imported_count = rawUpdater->update_counter;
             MW_dialog_message("SubUpdater", "finish");
         }
     }
-} // namespace NekoRay::sub
+} // namespace NekoGui_sub

@@ -1,10 +1,11 @@
-#include "NekoRay_Utils.hpp"
+#include "NekoGui_Utils.hpp"
 
 #include "3rdparty/base64.h"
 #include "3rdparty/QThreadCreateThread.hpp"
 
 #include <random>
 
+#include <QApplication>
 #include <QUrlQuery>
 #include <QTcpServer>
 #include <QTimer>
@@ -189,14 +190,17 @@ bool IsIpAddressV6(const QString &str) {
 
 QString DisplayTime(long long time, int formatType) {
     QDateTime t;
-    t.setSecsSinceEpoch(time);
+    t.setMSecsSinceEpoch(time * 1000);
     return QLocale().toString(t, QLocale::FormatType(formatType));
 }
 
 QWidget *GetMessageBoxParent() {
-    if (mainwindow == nullptr) return nullptr;
-    if (mainwindow->isVisible()) return mainwindow;
-    return nullptr;
+    auto activeWindow = QApplication::activeWindow();
+    if (activeWindow == nullptr && mainwindow != nullptr) {
+        if (mainwindow->isVisible()) return mainwindow;
+        return nullptr;
+    }
+    return activeWindow;
 }
 
 int MessageBoxWarning(const QString &title, const QString &text) {

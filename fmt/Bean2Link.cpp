@@ -3,7 +3,7 @@
 
 #include <QUrlQuery>
 
-namespace NekoRay::fmt {
+namespace NekoGui_fmt {
     QString SocksHttpBean::ToShareLink() {
         QUrl url;
         if (socks_http_type == type_HTTP) { // http
@@ -72,18 +72,27 @@ namespace NekoRay::fmt {
         return url.toString(QUrl::FullyEncoded);
     }
 
+    const char* fixShadowsocksUserNameEncodeMagic = "fixShadowsocksUserNameEncodeMagic-holder-for-QUrl";
+
     QString ShadowSocksBean::ToShareLink() {
         QUrl url;
         url.setScheme("ss");
-        auto username = method + ":" + password;
-        url.setUserName(username.toUtf8().toBase64(QByteArray::Base64Option::Base64UrlEncoding));
+        if (method.startsWith("2022-")) {
+            url.setUserName(fixShadowsocksUserNameEncodeMagic);
+        } else {
+            auto method_password = method + ":" + password;
+            url.setUserName(method_password.toUtf8().toBase64(QByteArray::Base64Option::Base64UrlEncoding));
+        }
         url.setHost(serverAddress);
         url.setPort(serverPort);
         if (!name.isEmpty()) url.setFragment(name);
         QUrlQuery q;
         if (!plugin.isEmpty()) q.addQueryItem("plugin", plugin);
         if (!q.isEmpty()) url.setQuery(q);
-        return url.toString(QUrl::FullyEncoded);
+        //
+        auto link = url.toString(QUrl::FullyEncoded);
+        link = link.replace(fixShadowsocksUserNameEncodeMagic, method + ":" + QUrl::toPercentEncoding(password));
+        return link;
     }
 
     QString VMessBean::ToShareLink() {
@@ -142,4 +151,4 @@ namespace NekoRay::fmt {
         return url.toString(QUrl::FullyEncoded);
     }
 
-} // namespace NekoRay::fmt
+} // namespace NekoGui_fmt

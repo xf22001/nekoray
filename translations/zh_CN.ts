@@ -84,10 +84,6 @@
         <translation>并发</translation>
     </message>
     <message>
-        <source>Test URL</source>
-        <translation>测试 URL</translation>
-    </message>
-    <message>
         <source>Use proxy when updating subscription</source>
         <translation>更新订阅时使用代理</translation>
     </message>
@@ -98,14 +94,6 @@
     <message>
         <source>Statistics refresh rate</source>
         <translation>流量统计刷新率</translation>
-    </message>
-    <message>
-        <source>Fast</source>
-        <translation>快</translation>
-    </message>
-    <message>
-        <source>Slow</source>
-        <translation>慢</translation>
     </message>
     <message>
         <source>Off</source>
@@ -243,6 +231,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
         <source>Multiplex (mux)</source>
         <translation>多路复用 Mux</translation>
     </message>
+    <message>
+        <source>Latency Test URL</source>
+        <translation>延迟测试 URL</translation>
+    </message>
+    <message>
+        <source>Download Test URL</source>
+        <translation>下载测试 URL</translation>
+    </message>
 </context>
 <context>
     <name>DialogEditGroup</name>
@@ -297,6 +293,18 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     <message>
         <source>Manually column width</source>
         <translation>手动调节列宽</translation>
+    </message>
+    <message>
+        <source>Front Proxy</source>
+        <translation>前置代理</translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation>无</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation>清除</translation>
     </message>
 </context>
 <context>
@@ -440,6 +448,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     <message>
         <source>Confirm</source>
         <translation>确认</translation>
+    </message>
+    <message>
+        <source>Server support is required</source>
+        <translation>需要服务器支持</translation>
+    </message>
+    <message>
+        <source>Reality short id. Accept only one value.</source>
+        <translation>Reality short id. 只接受一个值。</translation>
     </message>
 </context>
 <context>
@@ -751,6 +767,10 @@ This needs to be run NekoBox with administrator privileges.</source>
         <source>Traffic order is from top to bottom</source>
         <translation>流量顺序是从上到下（最后一个配置为流量的出口）</translation>
     </message>
+    <message>
+        <source>Name cannot be empty.</source>
+        <translation>名称 不能为空</translation>
+    </message>
 </context>
 <context>
     <name>EditCustom</name>
@@ -797,6 +817,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Please fill the complete config.</source>
         <translation>请填写完整配置。</translation>
+    </message>
+    <message>
+        <source>Name cannot be empty.</source>
+        <translation>名称 不能为空</translation>
     </message>
 </context>
 <context>
@@ -898,6 +922,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Plugin</source>
         <translation>插件</translation>
+    </message>
+    <message>
+        <source>Server support is required</source>
+        <translation>需要服务器支持</translation>
     </message>
 </context>
 <context>
@@ -1091,7 +1119,7 @@ This needs to be run NekoBox with administrator privileges.</source>
     </message>
     <message>
         <source>Add profile from clipboard</source>
-        <translation>从剪切板添加</translation>
+        <translation>从剪贴板添加</translation>
     </message>
     <message>
         <source>Debug Info</source>
@@ -1150,10 +1178,6 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>删除 %1 个项目？</translation>
     </message>
     <message>
-        <source>Reset traffic of %1 item(s) ?</source>
-        <translation>重置 %1 个项目的流量？</translation>
-    </message>
-    <message>
         <source>Config copied</source>
         <translation>配置已复制</translation>
     </message>
@@ -1164,10 +1188,6 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Clear</source>
         <translation>清除</translation>
-    </message>
-    <message>
-        <source>NekoRay</source>
-        <translation></translation>
     </message>
     <message>
         <source>fake</source>
@@ -1254,10 +1274,6 @@ End: %2</source>
     <message>
         <source>Settings</source>
         <translation>设置</translation>
-    </message>
-    <message>
-        <source>Input</source>
-        <translation>输入</translation>
     </message>
     <message>
         <source>New profile</source>
@@ -1426,18 +1442,6 @@ Split by line.</source>
         <translation>当前选中</translation>
     </message>
     <message>
-        <source>Please enter the items to be tested, separated by commas
-1. Latency
-2. Download speed
-3. In and Out IP
-4. UDP Latency</source>
-        <translation>请输入要测试的项目，用逗号分隔
-1. TCP 延迟
-2. 下载速度
-3. 入口出口 IP
-4. UDP DNS 延迟</translation>
-    </message>
-    <message>
         <source>Show Window</source>
         <translation>显示主窗口</translation>
     </message>
@@ -1446,8 +1450,8 @@ Split by line.</source>
         <translation>设置改变</translation>
     </message>
     <message>
-        <source>Restart nekoray to take effect.</source>
-        <translation>重启 nekoray 生效。</translation>
+        <source>Restart the program to take effect.</source>
+        <translation>重启程序生效。</translation>
     </message>
     <message>
         <source>Please run NekoBox as admin</source>
@@ -1468,6 +1472,30 @@ Split by line.</source>
     <message>
         <source>If there is no response for a long time, it is recommended to restart the software.</source>
         <translation>如果长时间没有反应，建议重启软件。</translation>
+    </message>
+    <message>
+        <source>Select mode, double-click or press Enter to select a profile, press ESC to exit.</source>
+        <translation>选择模式，双击或按回车键选择一个配置文件，按ESC键退出。</translation>
+    </message>
+    <message>
+        <source>Latency</source>
+        <translation>延迟</translation>
+    </message>
+    <message>
+        <source>UDP latency</source>
+        <translation>UDP 延迟</translation>
+    </message>
+    <message>
+        <source>Download speed</source>
+        <translation>下载速度</translation>
+    </message>
+    <message>
+        <source>In and Out IP</source>
+        <translation>入口出口IP</translation>
+    </message>
+    <message>
+        <source>Test Options</source>
+        <translation>测试选项</translation>
     </message>
 </context>
 <context>
@@ -1490,10 +1518,6 @@ Split by line.</source>
 </context>
 <context>
     <name>QObject</name>
-    <message>
-        <source>As Subscription</source>
-        <translation>作为订阅</translation>
-    </message>
     <message>
         <source>As link</source>
         <translation>作为链接</translation>
@@ -1607,6 +1631,14 @@ Release note:
     <message>
         <source>Core exits too frequently, stop automatic restart this profile.</source>
         <translation>Core 退出太频繁，停止自动重启。</translation>
+    </message>
+    <message>
+        <source>As Subscription (create new group)</source>
+        <translation>作为订阅（创建新组）</translation>
+    </message>
+    <message>
+        <source>As Subscription (add to this group)</source>
+        <translation>作为订阅（添加到该组）</translation>
     </message>
 </context>
 <context>

@@ -2,7 +2,7 @@
 
 #include "fmt/AbstractBean.hpp"
 
-namespace NekoRay::fmt {
+namespace NekoGui_fmt {
     class CustomBean : public AbstractBean {
     public:
         QString core;
@@ -31,7 +31,7 @@ namespace NekoRay::fmt {
             return core;
         };
 
-        QString DisplayCoreType() override { return NeedExternal(false) ? core : software_core_name; };
+        QString DisplayCoreType() override { return NeedExternal(true) == 0 ? software_core_name : core; };
 
         QString DisplayAddress() override {
             if (core == "internal") {
@@ -55,4 +55,4 @@ namespace NekoRay::fmt {
 
         CoreObjOutboundBuildResult BuildCoreObjV2Ray() override;
     };
-} // namespace NekoRay::fmt
+} // namespace NekoGui_fmt

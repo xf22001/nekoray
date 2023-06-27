@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>NekoRay</string>
+   <string notr="true">nya</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_3" stretch="0,0,0">
@@ -683,6 +683,9 @@
   <action name="menu_export_config">
    <property name="text">
     <string>Export %1 config</string>
+   </property>
+   <property name="shortcut">
+    <string notr="true">Ctrl+E</string>
    </property>
   </action>
   <action name="menu_reset_traffic">

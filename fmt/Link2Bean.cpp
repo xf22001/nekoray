@@ -3,7 +3,7 @@
 
 #include <QUrlQuery>
 
-namespace NekoRay::fmt {
+namespace NekoGui_fmt {
 
 #define DECODE_V2RAY_N_1                                                                                                        \
     QString linkN = DecodeB64IfValid(SubStrBefore(SubStrAfter(link, "://"), "#"), QByteArray::Base64Option::Base64UrlEncoding); \
@@ -101,18 +101,17 @@ namespace NekoRay::fmt {
             serverAddress = url.host();
             serverPort = url.port();
 
-            auto urlUserName = url.userName();
-            QString method_password;
-            if (urlUserName.contains(":")) {
-                // 2022 format
-                method_password = urlUserName;
-            } else {
+            if (url.password().isEmpty()) {
                 // traditional format
-                method_password = DecodeB64IfValid(urlUserName, QByteArray::Base64Option::Base64UrlEncoding);
+                auto method_password = DecodeB64IfValid(url.userName(), QByteArray::Base64Option::Base64UrlEncoding);
+                if (method_password.isEmpty()) return false;
+                method = SubStrBefore(method_password, ":");
+                password = SubStrAfter(method_password, ":");
+            } else {
+                // 2022 format
+                method = url.userName();
+                password = url.password();
             }
-            if (method_password.isEmpty()) return false;
-            method = SubStrBefore(method_password, ":");
-            password = SubStrAfter(method_password, ":");
 
             auto query = GetQuery(url);
             plugin = query.queryItemValue("plugin").replace("simple-obfs;", "obfs-local;");
@@ -194,14 +193,14 @@ namespace NekoRay::fmt {
 
         auto protocolStr = (query.hasQueryItem("protocol") ? query.queryItemValue("protocol") : "udp").toLower();
         if (protocolStr == "faketcp") {
-            protocol = fmt::HysteriaBean::hysteria_protocol_facktcp;
+            protocol = NekoGui_fmt::HysteriaBean::hysteria_protocol_facktcp;
         } else if (protocolStr.startsWith("wechat")) {
-            protocol = fmt::HysteriaBean::hysteria_protocol_wechat_video;
+            protocol = NekoGui_fmt::HysteriaBean::hysteria_protocol_wechat_video;
         }
 
         if (query.hasQueryItem("auth")) {
             authPayload = query.queryItemValue("auth");
-            authPayloadType = fmt::HysteriaBean::hysteria_auth_string;
+            authPayloadType = NekoGui_fmt::HysteriaBean::hysteria_auth_string;
         }
 
         alpn = query.queryItemValue("alpn");
@@ -213,4 +212,4 @@ namespace NekoRay::fmt {
         return true;
     }
 
-} // namespace NekoRay::fmt
+} // namespace NekoGui_fmt

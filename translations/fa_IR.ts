@@ -85,7 +85,7 @@
     </message>
     <message>
         <source>Test URL</source>
-        <translation>url تست</translation>
+        <translation type="vanished">url تست</translation>
     </message>
     <message>
         <source>Use proxy when updating subscription</source>
@@ -99,14 +99,6 @@
     <message>
         <source>Statistics refresh rate</source>
         <translation>نرخ تازه سازی آمار ترافیک</translation>
-    </message>
-    <message>
-        <source>Fast</source>
-        <translation>سریع</translation>
-    </message>
-    <message>
-        <source>Slow</source>
-        <translation>کند</translation>
     </message>
     <message>
         <source>Off</source>
@@ -243,6 +235,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
         <source>Multiplex (mux)</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Latency Test URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download Test URL</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogEditGroup</name>
@@ -297,6 +297,18 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     <message>
         <source>Manually column width</source>
         <translation>عرض ستون به صورت دستی</translation>
+    </message>
+    <message>
+        <source>Front Proxy</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>None</source>
+        <translation type="unfinished">هیچ یک</translation>
+    </message>
+    <message>
+        <source>Clear</source>
+        <translation type="unfinished">پاک کردن</translation>
     </message>
 </context>
 <context>
@@ -439,6 +451,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     </message>
     <message>
         <source>Confirm</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Server support is required</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Reality short id. Accept only one value.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -749,6 +769,10 @@ This needs to be run NekoBox with administrator privileges.</source>
         <source>Select Profile</source>
         <translation>انتخاب کردن پروفایل</translation>
     </message>
+    <message>
+        <source>Name cannot be empty.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditCustom</name>
@@ -794,6 +818,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     </message>
     <message>
         <source>Please fill the complete config.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Name cannot be empty.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -896,6 +924,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Plugin</source>
         <translation>پلاگین</translation>
+    </message>
+    <message>
+        <source>Server support is required</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -1027,10 +1059,6 @@ This needs to be run NekoBox with administrator privileges.</source>
 </context>
 <context>
     <name>MainWindow</name>
-    <message>
-        <source>NekoRay</source>
-        <translation type="unfinished"></translation>
-    </message>
     <message>
         <source>Program</source>
         <translation>برنامه</translation>
@@ -1341,10 +1369,6 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Reset traffic of %1 item(s) ?</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Copied %1 item(s)</source>
         <translation type="unfinished"></translation>
     </message>
@@ -1396,7 +1420,7 @@ End: %2</source>
     </message>
     <message>
         <source>Input</source>
-        <translation>ورودی</translation>
+        <translation type="vanished">ورودی</translation>
     </message>
     <message>
         <source>[%1] test error: %2</source>
@@ -1423,24 +1447,12 @@ End: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Please enter the items to be tested, separated by commas
-1. Latency
-2. Download speed
-3. In and Out IP
-4. UDP Latency</source>
-        <translation type="unfinished"></translation>
-    </message>
-    <message>
         <source>Show Window</source>
         <translation>نمایش پنجره برنامه</translation>
     </message>
     <message>
         <source>Settings changed</source>
         <translation type="unfinished">تنظیمات تغییر کرد</translation>
-    </message>
-    <message>
-        <source>Restart nekoray to take effect.</source>
-        <translation type="unfinished">برای اعمال تغییرات nekoray را مجددا راه اندازی کنید.</translation>
     </message>
     <message>
         <source>Please run NekoBox as admin</source>
@@ -1460,6 +1472,34 @@ End: %2</source>
     </message>
     <message>
         <source>Failed to stop, please restart the program.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Select mode, double-click or press Enter to select a profile, press ESC to exit.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Latency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>UDP latency</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Download speed</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>In and Out IP</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Test Options</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Restart the program to take effect.</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -1516,10 +1556,6 @@ Release note:
     <message>
         <source>Update is ready, restart to install?</source>
         <translation>به روز رسانی آماده است، برای نصب مجدد راه اندازی شود؟</translation>
-    </message>
-    <message>
-        <source>As Subscription</source>
-        <translation type="unfinished"></translation>
     </message>
     <message>
         <source>As link</source>
@@ -1600,6 +1636,14 @@ Direct: %2</source>
     </message>
     <message>
         <source>Core exits too frequently, stop automatic restart this profile.</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As Subscription (create new group)</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>As Subscription (add to this group)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

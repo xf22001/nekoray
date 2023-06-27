@@ -2,7 +2,7 @@
 #include "ui_dialog_vpn_settings.h"
 
 #include "main/GuiUtils.hpp"
-#include "main/NekoRay.hpp"
+#include "main/NekoGui.hpp"
 #include "ui/mainwindow_interface.h"
 
 #include <QMessageBox>
@@ -12,21 +12,21 @@ DialogVPNSettings::DialogVPNSettings(QWidget *parent) : QDialog(parent), ui(new 
     ADD_ASTERISK(this);
 
     ui->fake_dns->setVisible(!IS_NEKO_BOX);
-    ui->fake_dns->setChecked(NekoRay::dataStore->fake_dns);
+    ui->fake_dns->setChecked(NekoGui::dataStore->fake_dns);
     //
-    ui->vpn_implementation->setCurrentIndex(NekoRay::dataStore->vpn_implementation);
-    ui->vpn_mtu->setCurrentText(Int2String(NekoRay::dataStore->vpn_mtu));
-    ui->vpn_ipv6->setChecked(NekoRay::dataStore->vpn_ipv6);
-    ui->hide_console->setChecked(NekoRay::dataStore->vpn_hide_console);
+    ui->vpn_implementation->setCurrentIndex(NekoGui::dataStore->vpn_implementation);
+    ui->vpn_mtu->setCurrentText(Int2String(NekoGui::dataStore->vpn_mtu));
+    ui->vpn_ipv6->setChecked(NekoGui::dataStore->vpn_ipv6);
+    ui->hide_console->setChecked(NekoGui::dataStore->vpn_hide_console);
 #ifndef Q_OS_WIN
     ui->hide_console->setVisible(false);
 #endif
-    ui->strict_route->setChecked(NekoRay::dataStore->vpn_strict_route);
+    ui->strict_route->setChecked(NekoGui::dataStore->vpn_strict_route);
     ui->single_core->setVisible(IS_NEKO_BOX);
-    ui->single_core->setChecked(NekoRay::dataStore->vpn_internal_tun);
+    ui->single_core->setChecked(NekoGui::dataStore->vpn_internal_tun);
     //
-    D_LOAD_STRING(vpn_rule_cidr)
-    D_LOAD_STRING(vpn_rule_process)
+    D_LOAD_STRING_PLAIN(vpn_rule_cidr)
+    D_LOAD_STRING_PLAIN(vpn_rule_process)
     //
     connect(ui->whitelist_mode, &QCheckBox::stateChanged, this, [=](int state) {
         if (state == Qt::Checked) {
@@ -37,7 +37,7 @@ DialogVPNSettings::DialogVPNSettings(QWidget *parent) : QDialog(parent), ui(new 
             ui->gb_process_name->setTitle(tr("Bypass Process Name"));
         }
     });
-    ui->whitelist_mode->setChecked(NekoRay::dataStore->vpn_rule_white);
+    ui->whitelist_mode->setChecked(NekoGui::dataStore->vpn_rule_white);
 }
 
 DialogVPNSettings::~DialogVPNSettings() {
@@ -48,19 +48,26 @@ void DialogVPNSettings::accept() {
     //
     auto mtu = ui->vpn_mtu->currentText().toInt();
     if (mtu > 10000 || mtu < 1000) mtu = 9000;
-    NekoRay::dataStore->vpn_implementation = ui->vpn_implementation->currentIndex();
-    NekoRay::dataStore->fake_dns = ui->fake_dns->isChecked();
-    NekoRay::dataStore->vpn_mtu = mtu;
-    NekoRay::dataStore->vpn_ipv6 = ui->vpn_ipv6->isChecked();
-    NekoRay::dataStore->vpn_hide_console = ui->hide_console->isChecked();
-    NekoRay::dataStore->vpn_strict_route = ui->strict_route->isChecked();
-    NekoRay::dataStore->vpn_rule_white = ui->whitelist_mode->isChecked();
-    NekoRay::dataStore->vpn_internal_tun = ui->single_core->isChecked();
+    NekoGui::dataStore->vpn_implementation = ui->vpn_implementation->currentIndex();
+    NekoGui::dataStore->fake_dns = ui->fake_dns->isChecked();
+    NekoGui::dataStore->vpn_mtu = mtu;
+    NekoGui::dataStore->vpn_ipv6 = ui->vpn_ipv6->isChecked();
+    NekoGui::dataStore->vpn_hide_console = ui->hide_console->isChecked();
+    NekoGui::dataStore->vpn_strict_route = ui->strict_route->isChecked();
+    NekoGui::dataStore->vpn_rule_white = ui->whitelist_mode->isChecked();
+    bool isInternalChanged = NekoGui::dataStore->vpn_internal_tun != ui->single_core->isChecked();
+    NekoGui::dataStore->vpn_internal_tun = ui->single_core->isChecked();
     //
-    D_SAVE_STRING_QTEXTEDIT(vpn_rule_cidr)
-    D_SAVE_STRING_QTEXTEDIT(vpn_rule_process)
+    D_SAVE_STRING_PLAIN(vpn_rule_cidr)
+    D_SAVE_STRING_PLAIN(vpn_rule_process)
     //
-    MW_dialog_message("", "UpdateDataStore,VPNChanged");
+    QStringList msg{"UpdateDataStore"};
+    if (isInternalChanged) {
+        msg << "NeedRestart";
+    } else {
+        msg << "VPNChanged";
+    }
+    MW_dialog_message("", msg.join(","));
     QDialog::accept();
 }
 

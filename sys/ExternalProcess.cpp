@@ -1,12 +1,12 @@
 #include "ExternalProcess.hpp"
-#include "main/NekoRay.hpp"
+#include "main/NekoGui.hpp"
 
 #include <QTimer>
 #include <QDir>
 #include <QApplication>
 #include <QElapsedTimer>
 
-namespace NekoRay::sys {
+namespace NekoGui_sys {
 
     ExternalProcess::ExternalProcess() : QProcess() {
         // qDebug() << "[Debug] ExternalProcess()" << this << running_ext;
@@ -24,7 +24,7 @@ namespace NekoRay::sys {
         if (managed) {
             connect(this, &QProcess::readyReadStandardOutput, this, [&]() {
                 auto log = readAllStandardOutput();
-                if (logCounter.fetchAndAddRelaxed(log.count("\n")) > NekoRay::dataStore->max_log_line) return;
+                if (logCounter.fetchAndAddRelaxed(log.count("\n")) > NekoGui::dataStore->max_log_line) return;
                 MW_show_log_ext_vt100(log);
             });
             connect(this, &QProcess::readyReadStandardError, this, [&]() {
@@ -54,7 +54,7 @@ namespace NekoRay::sys {
 
         QProcess::setEnvironment(env);
 
-        if (NekoRay::dataStore->flag_linux_run_core_as_admin && dynamic_cast<CoreProcess *>(this) && program != "pkexec") {
+        if (NekoGui::dataStore->flag_linux_run_core_as_admin && dynamic_cast<CoreProcess *>(this) && program != "pkexec") {
             arguments.prepend(program);
             arguments.prepend("--keep-cwd");
             program = "pkexec";
@@ -85,7 +85,20 @@ namespace NekoRay::sys {
 
         connect(this, &QProcess::readyReadStandardOutput, this, [&]() {
             auto log = readAllStandardOutput();
-            if (logCounter.fetchAndAddRelaxed(log.count("\n")) > NekoRay::dataStore->max_log_line) return;
+            if (!NekoGui::dataStore->core_running) {
+                if (log.contains("grpc server listening")) {
+                    // The core really started
+                    NekoGui::dataStore->core_running = true;
+                    if (start_profile_when_core_is_up >= 0) {
+                        MW_dialog_message("ExternalProcess", "CoreStarted," + Int2String(start_profile_when_core_is_up));
+                        start_profile_when_core_is_up = -1;
+                    }
+                } else if (log.contains("failed to serve")) {
+                    // The core failed to start
+                    QProcess::kill();
+                }
+            }
+            if (logCounter.fetchAndAddRelaxed(log.count("\n")) > NekoGui::dataStore->max_log_line) return;
             MW_show_log(log);
         });
         connect(this, &QProcess::readyReadStandardError, this, [&]() {
@@ -105,10 +118,13 @@ namespace NekoRay::sys {
             }
         });
         connect(this, &QProcess::stateChanged, this, [&](QProcess::ProcessState state) {
-            NekoRay::dataStore->core_running = state == QProcess::Running;
+            if (state == QProcess::NotRunning) {
+                NekoGui::dataStore->core_running = false;
+            }
 
-            if (!dataStore->prepare_exit && state == QProcess::NotRunning) {
+            if (!NekoGui::dataStore->prepare_exit && state == QProcess::NotRunning) {
                 if (failed_to_start) return; // no retry
+                if (restarting) return;
 
                 MW_dialog_message("ExternalProcess", "CoreCrashed");
 
@@ -124,18 +140,9 @@ namespace NekoRay::sys {
                 }
 
                 // Restart
-                restart_id = NekoRay::dataStore->started_id;
+                start_profile_when_core_is_up = NekoGui::dataStore->started_id;
                 MW_show_log("[Error] " + QObject::tr("Core exited, restarting."));
-
                 setTimeout([=] { Restart(); }, this, 1000);
-            } else if (state == QProcess::Running && restart_id >= 0) {
-                // Restart profile
-                setTimeout(
-                    [=] {
-                        MW_dialog_message("ExternalProcess", "CoreRestarted," + Int2String(restart_id));
-                        restart_id = -1;
-                    },
-                    this, 1000);
             }
         });
     }
@@ -143,22 +150,25 @@ namespace NekoRay::sys {
     void CoreProcess::Start() {
         show_stderr = false;
         // set extra env
-        auto v2ray_asset_dir = FindCoreAsset("geoip.dat");
+        auto v2ray_asset_dir = NekoGui::FindCoreAsset("geoip.dat");
         if (!v2ray_asset_dir.isEmpty()) {
             v2ray_asset_dir = QFileInfo(v2ray_asset_dir).absolutePath();
             env << "V2RAY_LOCATION_ASSET=" + v2ray_asset_dir;
         }
-        if (NekoRay::dataStore->core_ray_direct_dns) env << "NKR_CORE_RAY_DIRECT_DNS=1";
-        if (NekoRay::dataStore->core_ray_windows_disable_auto_interface) env << "NKR_CORE_RAY_WINDOWS_DISABLE_AUTO_INTERFACE=1";
+        if (NekoGui::dataStore->core_ray_direct_dns) env << "NKR_CORE_RAY_DIRECT_DNS=1";
+        if (NekoGui::dataStore->core_ray_windows_disable_auto_interface) env << "NKR_CORE_RAY_WINDOWS_DISABLE_AUTO_INTERFACE=1";
         //
         ExternalProcess::Start();
-        write((dataStore->core_token + "\n").toUtf8());
+        write((NekoGui::dataStore->core_token + "\n").toUtf8());
     }
 
     void CoreProcess::Restart() {
-        Kill();
+        restarting = true;
+        QProcess::kill();
+        QProcess::waitForFinished(500);
         ExternalProcess::started = false;
         Start();
+        restarting = false;
     }
 
-} // namespace NekoRay::sys
+} // namespace NekoGui_sys
