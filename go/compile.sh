@@ -9,16 +9,17 @@
 #   描    述：
 #
 #================================================================
+neko_common="github.com/matsuridayo/libneko/neko_common"
 version_standalone="nekoray-"$(cat ../nekoray_version.txt)
-pushd /home/xiaofei/media/android/v2ray-core
-version_v2ray=$(git log --pretty=format:'%h' -n 1)
+pushd /home/xiaofei/media/android/Xray-core
+Version_Xray=$(git log --pretty=format:'%h' -n 1)
 popd
 function main() {
 	pushd cmd/nekoray_core/
-	go build -v -trimpath -ldflags "-w -s -X neko/pkg/neko_common.Version_v2ray=$version_v2ray -X neko/pkg/neko_common.Version_neko=$version_standalone"
+	go build -v -trimpath -ldflags "-w -s -X $neko_common.Version_v2ray=$Version_Xray -X $neko_common.Version_neko=$version_standalone"
 	popd
 	pushd cmd/nekobox_core/
-	go build -v -trimpath -ldflags "-w -s -X neko/pkg/neko_common.Version_neko=$version_standalone" -tags "with_gvisor,with_quic,with_wireguard"
+	go build -v -trimpath -ldflags "-w -s -X $neko_common.Version_neko=$version_standalone" -tags "with_gvisor,with_quic,with_wireguard,with_utls,with_clash_api"
 	popd
 }
 
