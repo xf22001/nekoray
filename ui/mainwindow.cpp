@@ -115,7 +115,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     ui->toolButton_server->setMenu(ui->menu_server);
     ui->menubar->setVisible(false);
     connect(ui->toolButton_document, &QToolButton::clicked, this, [=] { QDesktopServices::openUrl(QUrl("https://matsuridayo.github.io/")); });
-    connect(ui->toolButton_ads, &QToolButton::clicked, this, [=] { QDesktopServices::openUrl(QUrl("https://matsuricom.github.io/")); });
+    connect(ui->toolButton_ads, &QToolButton::clicked, this, [=] { QDesktopServices::openUrl(QUrl("https://matsuricom.pages.dev/")); });
     connect(ui->toolButton_update, &QToolButton::clicked, this, [=] { runOnNewThread([=] { CheckUpdate(); }); });
 
     // Setup log UI
@@ -247,16 +247,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     tray->setContextMenu(ui->menu_program); // 创建托盘菜单
     tray->show();                           // 让托盘图标显示在系统托盘上
     connect(tray, &QSystemTrayIcon::activated, this, [=](QSystemTrayIcon::ActivationReason reason) {
-        switch (reason) {
-            case QSystemTrayIcon::Trigger:
-                if (this->isVisible()) {
-                    hide();
-                } else {
-                    ACTIVE_THIS_WINDOW
-                }
-                break;
-            default:
-                break;
+        if (reason == QSystemTrayIcon::Trigger) {
+            if (this->isVisible()) {
+                hide();
+            } else {
+                ACTIVE_THIS_WINDOW
+            }
         }
     });
 
@@ -284,7 +280,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
             a->setCheckable(true);
             if (NekoGui::dataStore->started_id == pf->id) a->setChecked(true);
             ui->menuActive_Server->addAction(a);
-            if (++active_server_item_count == 50) break;
+            if (++active_server_item_count == 100) break;
         }
         // active routing
         for (const auto &old: ui->menuActive_Routing->actions()) {
