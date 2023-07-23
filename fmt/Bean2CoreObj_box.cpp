@@ -106,7 +106,16 @@ namespace NekoGui_fmt {
         outbound["server_port"] = serverPort;
         outbound["method"] = method;
         outbound["password"] = password;
-        outbound["udp_over_tcp"] = uot;
+
+        if (uot != 0) {
+            QJsonObject udp_over_tcp{
+                {"enabled", true},
+                {"version", uot},
+            };
+            outbound["udp_over_tcp"] = udp_over_tcp;
+        } else {
+            outbound["udp_over_tcp"] = false;
+        }
 
         if (!plugin.trimmed().isEmpty()) {
             outbound["plugin"] = SubStrBefore(plugin, ";");
@@ -146,6 +155,13 @@ namespace NekoGui_fmt {
 
         QJsonObject settings;
         if (proxy_type == proxy_VLESS) {
+            if (flow.right(7) == "-udp443") {
+                // 检查末尾是否包含"-udp443"，如果是，则删去
+                flow.chop(7);
+            } else if (flow == "none") {
+                // 不使用 flow
+                flow = "";
+            }
             outbound["uuid"] = password.trimmed();
             outbound["flow"] = flow;
         } else {

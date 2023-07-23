@@ -181,8 +181,7 @@ namespace NekoGui {
 
         // Inbounds
         QJsonObject sniffing{
-            {"destOverride", dataStore->fake_dns ? QJsonArray{"fakedns", "http", "tls", "quic"}
-                                                 : QJsonArray{"http", "tls", "quic"}},
+            {"destOverride", QJsonArray{"http", "tls", "quic"}},
             {"enabled", true},
             {"metadataOnly", false},
             {"routeOnly", dataStore->routing->sniffing_mode == SniffingMode::FOR_ROUTING},
@@ -196,7 +195,7 @@ namespace NekoGui {
             inboundObj["listen"] = dataStore->inbound_address;
             inboundObj["port"] = dataStore->inbound_socks_port;
             QJsonObject socksSettings = {{"udp", true}};
-            if (dataStore->fake_dns || dataStore->routing->sniffing_mode != SniffingMode::DISABLE) {
+            if (dataStore->routing->sniffing_mode != SniffingMode::DISABLE) {
                 inboundObj["sniffing"] = sniffing;
             }
             if (dataStore->inbound_auth->NeedAuth()) {
@@ -295,7 +294,7 @@ namespace NekoGui {
 
         // Remote or FakeDNS
         QJsonObject dnsServerRemote;
-        dnsServerRemote["address"] = dataStore->fake_dns ? "fakedns" : dataStore->routing->remote_dns;
+        dnsServerRemote["address"] = dataStore->routing->remote_dns;
         dnsServerRemote["domains"] = QList2QJsonArray<QString>(status->domainListDNSRemote);
         dnsServerRemote["queryStrategy"] = dataStore->routing->remote_dns_strategy;
         if (!status->forTest) dnsServers += dnsServerRemote;
@@ -651,6 +650,7 @@ namespace NekoGui {
                     auto muxObj = QJsonObject{
                         {"enabled", true},
                         {"protocol", dataStore->mux_protocol},
+                        {"padding", dataStore->mux_padding},
                         {"max_streams", dataStore->mux_concurrency},
                     };
                     outbound["multiplex"] = muxObj;
@@ -863,6 +863,19 @@ namespace NekoGui {
                 {"detour", "direct"},
             };
 
+        // Fakedns
+        if (IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
+            dnsServers += QJsonObject{
+                {"tag", "dns-fake"},
+                {"address", "fakeip"},
+            };
+            dns["fakeip"] = QJsonObject{
+                {"enabled", true},
+                {"inet4_range", "198.18.0.0/15"},
+                {"inet6_range", "fc00::/18"},
+            };
+        }
+
         // Underlying 100% Working DNS
         dnsServers += QJsonObject{
             {"tag", "dns-local"},
@@ -877,9 +890,16 @@ namespace NekoGui {
             rule["server"] = server;
             dnsRules += rule;
         };
-
         add_rule_dns(status->domainListDNSRemote, "dns-remote");
         add_rule_dns(status->domainListDNSDirect, "dns-direct");
+
+        // fakedns rule
+        if (IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
+            dnsRules += QJsonObject{
+                {"inbound", "tun-in"},
+                {"server", "dns-fake"},
+            };
+        }
 
         dns["servers"] = dnsServers;
         dns["rules"] = dnsRules;
@@ -1041,24 +1061,25 @@ namespace NekoGui {
         auto configFn = ":/neko/vpn/sing-box-vpn.json";
         if (QFile::exists("vpn/sing-box-vpn.json")) configFn = "vpn/sing-box-vpn.json";
         auto config = ReadFileText(configFn)
-                          .replace("%IPV6_ADDRESS%", dataStore->vpn_ipv6 ? R"("inet6_address": "fdfe:dcba:9876::1/126",)" : "")
+                          .replace("//%IPV6_ADDRESS%", dataStore->vpn_ipv6 ? R"("inet6_address": "fdfe:dcba:9876::1/126",)" : "")
+                          .replace("//%SOCKS_USER_PASS%", socks_user_pass)
+                          .replace("//%PROCESS_NAME_RULE%", process_name_rule)
+                          .replace("//%CIDR_RULE%", cidr_rule)
                           .replace("%MTU%", Int2String(dataStore->vpn_mtu))
                           .replace("%STACK%", Preset::SingBox::VpnImplementation.value(dataStore->vpn_implementation))
-                          .replace("%PROCESS_NAME_RULE%", process_name_rule)
-                          .replace("%CIDR_RULE%", cidr_rule)
                           .replace("%TUN_NAME%", genTunName())
                           .replace("%STRICT_ROUTE%", dataStore->vpn_strict_route ? "true" : "false")
-                          .replace("%SOCKS_USER_PASS%", socks_user_pass)
                           .replace("%FINAL_OUT%", no_match_out)
                           .replace("%DNS_ADDRESS%", BOX_UNDERLYING_DNS)
+                          .replace("%FAKE_DNS_INBOUND%", dataStore->fake_dns ? "tun-in" : "empty")
                           .replace("%PORT%", Int2String(dataStore->inbound_socks_port));
         // hook.js
         auto source = qjs::ReadHookJS();
         if (!source.isEmpty()) {
             qjs::QJS js(source);
-            auto js_result = js.EvalFunction("hook.hook_vpn_config", config);
+            auto js_result = js.EvalFunction("hook.hook_tun_config", config);
             if (config != js_result) {
-                MW_show_log("hook.js modified your VPN config.");
+                MW_show_log("hook.js modified your Tun config.");
                 config = js_result;
             }
         }
@@ -1087,9 +1108,9 @@ namespace NekoGui {
         auto source = qjs::ReadHookJS();
         if (!source.isEmpty()) {
             qjs::QJS js(source);
-            auto js_result = js.EvalFunction("hook.hook_vpn_script", script);
+            auto js_result = js.EvalFunction("hook.hook_tun_script", script);
             if (script != js_result) {
-                MW_show_log("hook.js modified your VPN script.");
+                MW_show_log("hook.js modified your Tun script.");
                 script = js_result;
             }
         }

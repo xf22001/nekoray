@@ -66,6 +66,7 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
     } else {
         ui->log_level->addItems({"debug", "info", "warning", "none"});
         ui->mux_protocol->hide();
+        ui->mux_padding->hide();
     }
 
     refresh_auth();
@@ -76,6 +77,7 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
     D_LOAD_INT(inbound_socks_port)
     D_LOAD_INT_ENABLE(inbound_http_port, http_enable)
     D_LOAD_INT(test_concurrent)
+    D_LOAD_INT(test_download_timeout)
     D_LOAD_STRING(test_latency_url)
     D_LOAD_STRING(test_download_url)
 
@@ -239,6 +241,7 @@ DialogBasicSettings::DialogBasicSettings(QWidget *parent)
     // Mux
     D_LOAD_INT(mux_concurrency)
     D_LOAD_COMBO_STRING(mux_protocol)
+    D_LOAD_BOOL(mux_padding)
     D_LOAD_BOOL(mux_default_on)
 
     // Security
@@ -263,6 +266,7 @@ void DialogBasicSettings::accept() {
     D_SAVE_INT(inbound_socks_port)
     D_SAVE_INT_ENABLE(inbound_http_port, http_enable)
     D_SAVE_INT(test_concurrent)
+    D_SAVE_INT(test_download_timeout)
     D_SAVE_STRING(test_latency_url)
     D_SAVE_STRING(test_download_url)
 
@@ -307,6 +311,7 @@ void DialogBasicSettings::accept() {
     // Mux
     D_SAVE_INT(mux_concurrency)
     D_SAVE_COMBO_STRING(mux_protocol)
+    D_SAVE_BOOL(mux_padding)
     D_SAVE_BOOL(mux_default_on)
 
     // Security
@@ -411,8 +416,8 @@ void DialogBasicSettings::on_core_settings_clicked() {
     auto core_box_underlying_dns_l = new QLabel(tr("Override underlying DNS"));
     core_box_underlying_dns_l->setToolTip(tr(
         "It is recommended to leave it blank, but it sometimes does not work, at this time you can set this option.\n"
-        "For NekoRay, this rewrites the underlying(localhost) DNS in VPN mode.\n"
-        "For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mode, and also URL Test."));
+        "For NekoRay, this rewrites the underlying(localhost) DNS in Tun Mode.\n"
+        "For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mode, and also URL Test."));
     core_box_underlying_dns = new MyLineEdit;
     core_box_underlying_dns->setText(NekoGui::dataStore->core_box_underlying_dns);
     core_box_underlying_dns->setMinimumWidth(300);
@@ -439,7 +444,7 @@ void DialogBasicSettings::on_core_settings_clicked() {
         layout->addWidget(core_box_clash_api_secret, line, 1);
     } else {
         auto core_ray_direct_dns_l = new QLabel("NKR_CORE_RAY_DIRECT_DNS");
-        core_ray_direct_dns_l->setToolTip(tr("If you VPN mode is not working, try to change this option."));
+        core_ray_direct_dns_l->setToolTip(tr("If you Tun Mode is not working, try to change this option."));
         core_ray_direct_dns = new QCheckBox;
         core_ray_direct_dns->setChecked(NekoGui::dataStore->core_ray_direct_dns);
         connect(core_ray_direct_dns, &QCheckBox::clicked, this, [&] { CACHE.needRestart = true; });
@@ -454,7 +459,7 @@ void DialogBasicSettings::on_core_settings_clicked() {
         layout->addWidget(core_ray_freedom_domainStrategy, line, 1);
 #ifdef Q_OS_WIN
         auto core_ray_windows_disable_auto_interface_l = new QLabel("NKR_CORE_RAY_WINDOWS_DISABLE_AUTO_INTERFACE");
-        core_ray_windows_disable_auto_interface_l->setToolTip(tr("If you VPN mode is not working, try to change this option."));
+        core_ray_windows_disable_auto_interface_l->setToolTip(tr("If you Tun Mode is not working, try to change this option."));
         core_ray_windows_disable_auto_interface = new QCheckBox;
         core_ray_windows_disable_auto_interface->setChecked(NekoGui::dataStore->core_ray_windows_disable_auto_interface);
         connect(core_ray_windows_disable_auto_interface, &QCheckBox::clicked, this, [&] { CACHE.needRestart = true; });

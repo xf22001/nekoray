@@ -37,9 +37,9 @@ namespace NekoGui_fmt {
 
         stream->security = GetQueryValue(query, "security", "");
         stream->sni = GetQueryValue(query, "sni");
-
         if (link.startsWith("https")) stream->security = "tls";
-        return true;
+
+        return !serverAddress.isEmpty();
     }
 
     bool TrojanVLESSBean::TryParseLink(const QString &link) {
@@ -64,7 +64,7 @@ namespace NekoGui_fmt {
         stream->reality_pbk = GetQueryValue(query, "pbk", "");
         stream->reality_sid = GetQueryValue(query, "sid", "");
         stream->reality_spx = GetQueryValue(query, "spx", "");
-        if (IS_NEKO_BOX) stream->utlsFingerprint = GetQueryValue(query, "fp", "");
+        stream->utlsFingerprint = GetQueryValue(query, "fp", "");
 
         // type
         if (stream->network == "ws") {
@@ -87,7 +87,7 @@ namespace NekoGui_fmt {
             flow = GetQueryValue(query, "flow", "");
         }
 
-        return !password.isEmpty();
+        return !(password.isEmpty() || serverAddress.isEmpty());
     }
 
     bool ShadowSocksBean::TryParseLink(const QString &link) {
@@ -124,7 +124,7 @@ namespace NekoGui_fmt {
             method = url.userName();
             password = url.password();
         }
-        return true;
+        return !(serverAddress.isEmpty() || method.isEmpty() || password.isEmpty());
     }
 
     bool VMessBean::TryParseLink(const QString &link) {
@@ -171,7 +171,7 @@ namespace NekoGui_fmt {
         username = url.userName();
         password = url.password();
 
-        return !(username.isEmpty() || password.isEmpty());
+        return !(username.isEmpty() || password.isEmpty() || serverAddress.isEmpty());
     }
 
     bool HysteriaBean::TryParseLink(const QString &link) {

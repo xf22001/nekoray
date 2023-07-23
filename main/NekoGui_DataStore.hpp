@@ -33,7 +33,7 @@ namespace NekoGui {
 
         static QStringList List();
 
-        static void SetToActive(const QString &name);
+        static bool SetToActive(const QString &name);
     };
 
     class ExtraCore : public JsonStore {
@@ -74,7 +74,7 @@ namespace NekoGui {
         QString appdataDir = "";
         QStringList ignoreConnTag = {};
 
-        Routing *routing = new Routing;
+        std::unique_ptr<Routing> routing;
         int imported_count = 0;
         bool refreshing_group_list = false;
         bool refreshing_group = false;
@@ -87,6 +87,8 @@ namespace NekoGui {
         bool flag_tray = false;
         bool flag_debug = false;
         bool flag_linux_run_core_as_admin = false;
+        bool flag_restart_tun_on = false;
+        bool flag_reorder = false;
 
         // Saved
 
@@ -94,11 +96,13 @@ namespace NekoGui {
         QString log_level = "warning";
         QString test_latency_url = "http://cp.cloudflare.com/";
         QString test_download_url = "http://cachefly.cachefly.net/10mb.test";
+        int test_download_timeout = 30;
         int test_concurrent = 5;
         int traffic_loop_interval = 1000;
         bool connection_statistics = false;
         int current_group = 0; // group id
         QString mux_protocol = "";
+        bool mux_padding = false;
         int mux_concurrency = 8;
         bool mux_default_on = false;
         QString theme = "0";

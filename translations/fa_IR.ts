@@ -219,12 +219,12 @@
     </message>
     <message>
         <source>It is recommended to leave it blank, but it sometimes does not work, at this time you can set this option.
-For NekoRay, this rewrites the underlying(localhost) DNS in VPN mode.
-For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mode, and also URL Test.</source>
+For NekoRay, this rewrites the underlying(localhost) DNS in Tun Mode.
+For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mode, and also URL Test.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>If you VPN mode is not working, try to change this option.</source>
+        <source>If you Tun Mode is not working, try to change this option.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -241,6 +241,10 @@ For NekoBox, this rewrites the underlying(localhost) DNS in VPN mode, normal mod
     </message>
     <message>
         <source>Download Test URL</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Timeout (s)</source>
         <translation type="unfinished"></translation>
     </message>
 </context>
@@ -691,11 +695,17 @@ These settings can be changed later.</source>
         <source>Format</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>This is especially important and it is recommended to use the default value of &quot;localhost&quot;.
+If the default value does not work, try changing it to &quot;223.5.5.5&quot;.
+For more information, see the document &quot;Configuration/DNS&quot;.</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogVPNSettings</name>
     <message>
-        <source>VPN Settings</source>
+        <source>Tun Settings</source>
         <translation>تنظیمات vpn</translation>
     </message>
     <message>
@@ -703,7 +713,7 @@ These settings can be changed later.</source>
         <translation>مخفی کردن کنسول</translation>
     </message>
     <message>
-        <source>VPN Enable IPv6</source>
+        <source>Tun Enable IPv6</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -926,8 +936,12 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>پلاگین</translation>
     </message>
     <message>
-        <source>Server support is required</source>
+        <source>Version of UDP over TCP protocol, server support is required.</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Off</source>
+        <translation type="unfinished">خاموش</translation>
     </message>
 </context>
 <context>
@@ -1084,7 +1098,7 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>بروزرسانی</translation>
     </message>
     <message>
-        <source>VPN Mode</source>
+        <source>Tun Mode</source>
         <translation>حالتvpn</translation>
     </message>
     <message>
@@ -1284,7 +1298,7 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>دامنه را حل کنید</translation>
     </message>
     <message>
-        <source>VPN Settings</source>
+        <source>Tun Settings</source>
         <translation>تنظیمات vpn</translation>
     </message>
     <message>
@@ -1297,7 +1311,7 @@ This needs to be run NekoBox with administrator privileges.</source>
     </message>
     <message>
         <source>Default</source>
-        <translation>پیش فرض</translation>
+        <translation type="vanished">پیش فرض</translation>
     </message>
     <message>
         <source>Load routing and apply: %1</source>
@@ -1308,12 +1322,12 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>خطا</translation>
     </message>
     <message>
-        <source>VPN settings changed</source>
-        <translation>تنظیمات VPN تغییر کرد</translation>
+        <source>Tun Settings changed</source>
+        <translation>تنظیمات Tun تغییر کرد</translation>
     </message>
     <message>
-        <source>Restart VPN to take effect.</source>
-        <translation>VPN را مجدداً راه اندازی کنید تا اعمال شود.</translation>
+        <source>Restart Tun to take effect.</source>
+        <translation>Tun را مجدداً راه اندازی کنید تا اعمال شود.</translation>
     </message>
     <message>
         <source>Confirmation</source>
@@ -1336,7 +1350,7 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>تنظیمات</translation>
     </message>
     <message>
-        <source>Current server is incompatible with VPN. Please stop the server first, enable VPN mode, and then restart.</source>
+        <source>Current server is incompatible with Tun. Please stop the server first, enable Tun Mode, and then restart.</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
@@ -1415,8 +1429,8 @@ End: %2</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <source>Failed to stop VPN process</source>
-        <translation>فرآیند VPN متوقف نشد</translation>
+        <source>Failed to stop Tun process</source>
+        <translation>فرآیند Tun متوقف نشد</translation>
     </message>
     <message>
         <source>Input</source>
@@ -1645,6 +1659,10 @@ Direct: %2</source>
     <message>
         <source>As Subscription (add to this group)</source>
         <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Default</source>
+        <translation type="unfinished">پیش فرض</translation>
     </message>
 </context>
 <context>

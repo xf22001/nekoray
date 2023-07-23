@@ -57,12 +57,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     };
 
     // Load Manager
-    auto isLoaded = NekoGui::profileManager->Load();
-    if (!isLoaded) {
-        auto defaultGroup = NekoGui::ProfileManager::NewGroup();
-        defaultGroup->name = tr("Default");
-        NekoGui::profileManager->AddGroup(defaultGroup);
-    }
+    NekoGui::profileManager->LoadManager();
 
     // Setup misc UI
     themeManager->ApplyTheme(NekoGui::dataStore->theme);
@@ -72,11 +67,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menu_stop, &QAction::triggered, this, [=]() { neko_stop(); });
     connect(ui->tabWidget->tabBar(), &QTabBar::tabMoved, this, [=](int from, int to) {
         // use tabData to track tab & gid
-        NekoGui::profileManager->_groups.clear();
+        NekoGui::profileManager->groupsTabOrder.clear();
         for (int i = 0; i < ui->tabWidget->tabBar()->count(); i++) {
-            NekoGui::profileManager->_groups += ui->tabWidget->tabBar()->tabData(i).toInt();
+            NekoGui::profileManager->groupsTabOrder += ui->tabWidget->tabBar()->tabData(i).toInt();
         }
-        NekoGui::profileManager->Save();
+        NekoGui::profileManager->SaveManager();
     });
     ui->label_running->installEventFilter(this);
     ui->label_inbound->installEventFilter(this);
@@ -99,8 +94,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         software_core_name = "sing-box";
         // replace default values
         if (NekoGui::dataStore->log_level == "warning") NekoGui::dataStore->log_level = "info";
-        if (!Preset::SingBox::DomainStrategy.contains(NekoGui::dataStore->routing->domain_strategy)) NekoGui::dataStore->routing->domain_strategy = "";
-        if (!Preset::SingBox::DomainStrategy.contains(NekoGui::dataStore->routing->outbound_domain_strategy)) NekoGui::dataStore->routing->outbound_domain_strategy = "";
         if (NekoGui::dataStore->mux_protocol.isEmpty()) NekoGui::dataStore->mux_protocol = "h2mux";
         //
         if (QDir("dashboard").count() == 0) {
@@ -422,11 +415,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
         DS_cores);
 
     // Remember system proxy
-    if (NekoGui::dataStore->remember_enable) {
+    if (NekoGui::dataStore->remember_enable || NekoGui::dataStore->flag_restart_tun_on) {
         if (NekoGui::dataStore->remember_spmode.contains("system_proxy")) {
             neko_set_spmode_system_proxy(true, false);
         }
-        if (NekoGui::dataStore->remember_spmode.contains("vpn")) {
+        if (NekoGui::dataStore->remember_spmode.contains("vpn") || NekoGui::dataStore->flag_restart_tun_on) {
             neko_set_spmode_vpn(true, false);
         }
     }
@@ -458,13 +451,13 @@ MainWindow::~MainWindow() {
 // Group tab manage
 
 inline int tabIndex2GroupId(int index) {
-    if (NekoGui::profileManager->_groups.length() <= index) return -1;
-    return NekoGui::profileManager->_groups[index];
+    if (NekoGui::profileManager->groupsTabOrder.length() <= index) return -1;
+    return NekoGui::profileManager->groupsTabOrder[index];
 }
 
 inline int groupId2TabIndex(int gid) {
-    for (int key = 0; key < NekoGui::profileManager->_groups.count(); key++) {
-        if (NekoGui::profileManager->_groups[key] == gid) return key;
+    for (int key = 0; key < NekoGui::profileManager->groupsTabOrder.count(); key++) {
+        if (NekoGui::profileManager->groupsTabOrder[key] == gid) return key;
     }
     return 0;
 }
@@ -534,7 +527,7 @@ void MainWindow::dialog_message_impl(const QString &sender, const QString &info)
         }
         refresh_proxy_list();
         if (info.contains("VPNChanged") && NekoGui::dataStore->spmode_vpn) {
-            MessageBoxWarning(tr("VPN settings changed"), tr("Restart VPN to take effect."));
+            MessageBoxWarning(tr("Tun Settings changed"), tr("Restart Tun to take effect."));
         }
         if (suggestRestartProxy && NekoGui::dataStore->started_id >= 0 &&
             QMessageBox::question(GetMessageBoxParent(), tr("Confirmation"), tr("Settings changed, restart proxy?")) == QMessageBox::StandardButton::Yes) {
@@ -646,6 +639,7 @@ void MainWindow::on_commitDataRequest() {
     }
     //
     NekoGui::dataStore->Save();
+    NekoGui::profileManager->SaveManager();
     qDebug() << "End of data save";
 }
 
@@ -688,12 +682,15 @@ void MainWindow::on_menu_exit_triggered() {
         if (arguments.length() > 0) {
             arguments.removeFirst();
             arguments.removeAll("-tray");
+            arguments.removeAll("-flag_restart_tun_on");
         }
         auto isLauncher = qEnvironmentVariable("NKR_FROM_LAUNCHER") == "1";
         if (isLauncher) arguments.prepend("--");
         auto program = isLauncher ? "./launcher" : QApplication::applicationFilePath();
 
-        if (exit_reason == 3) { // restart as admin
+        if (exit_reason == 3) {
+            // Tun restart as admin
+            arguments << "-flag_restart_tun_on";
 #ifdef Q_OS_WIN
             WinCommander::runProcessElevated(program, arguments, "", WinCommander::SW_NORMAL, false);
 #else
@@ -768,7 +765,7 @@ void MainWindow::neko_set_spmode_vpn(bool enable, bool save) {
                 }
             } else {
                 if (NekoGui::dataStore->need_keep_vpn_off) {
-                    MessageBoxWarning(software_name, tr("Current server is incompatible with VPN. Please stop the server first, enable VPN mode, and then restart."));
+                    MessageBoxWarning(software_name, tr("Current server is incompatible with Tun. Please stop the server first, enable Tun Mode, and then restart."));
                     neko_set_spmode_FAILED
                 }
                 if (!StartVPNProcess()) {
@@ -900,7 +897,7 @@ void MainWindow::refresh_groups() {
     }
 
     int index = 0;
-    for (const auto &gid: NekoGui::profileManager->_groups) {
+    for (const auto &gid: NekoGui::profileManager->groupsTabOrder) {
         auto group = NekoGui::profileManager->GetGroup(gid);
         if (index == 0) {
             ui->tabWidget->setTabText(0, group->name);
@@ -920,7 +917,7 @@ void MainWindow::refresh_groups() {
     if (NekoGui::profileManager->CurrentGroup() == nullptr) {
         NekoGui::dataStore->current_group = -1;
         ui->tabWidget->setCurrentIndex(groupId2TabIndex(0));
-        show_group(NekoGui::profileManager->_groups.count() > 0 ? NekoGui::profileManager->_groups.first() : 0);
+        show_group(NekoGui::profileManager->groupsTabOrder.count() > 0 ? NekoGui::profileManager->groupsTabOrder.first() : 0);
     } else {
         ui->tabWidget->setCurrentIndex(groupId2TabIndex(NekoGui::dataStore->current_group));
         show_group(NekoGui::dataStore->current_group);
@@ -941,11 +938,11 @@ void MainWindow::refresh_proxy_list_impl(const int &id, GroupSortAction groupSor
         ui->proxyListTable->setRowCount(0);
         // 添加行
         int row = -1;
-        for (const auto &profile: NekoGui::profileManager->profiles) {
+        for (const auto &[id, profile]: NekoGui::profileManager->profiles) {
             if (NekoGui::dataStore->current_group != profile->gid) continue;
             row++;
             ui->proxyListTable->insertRow(row);
-            ui->proxyListTable->row2Id += profile->id;
+            ui->proxyListTable->row2Id += id;
         }
     }
 
@@ -1118,7 +1115,7 @@ void MainWindow::on_menu_move_triggered() {
     if (ents.isEmpty()) return;
 
     auto items = QStringList{};
-    for (auto gid: NekoGui::profileManager->_groups) {
+    for (auto gid: NekoGui::profileManager->groupsTabOrder) {
         auto group = NekoGui::profileManager->GetGroup(gid);
         if (group == nullptr) continue;
         items += Int2String(gid) + " " + group->name;
@@ -1167,7 +1164,7 @@ void MainWindow::on_menu_profile_debug_info_triggered() {
         QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(QString("profiles/%1.json").arg(ents.first()->id)).absoluteFilePath()));
     } else if (btn == 2) {
         NekoGui::dataStore->Load();
-        NekoGui::profileManager->Load();
+        NekoGui::profileManager->LoadManager();
         refresh_proxy_list();
     }
 }
@@ -1395,7 +1392,7 @@ void MainWindow::on_menu_update_subscription_triggered() {
 void MainWindow::on_menu_remove_unavailable_triggered() {
     QList<std::shared_ptr<NekoGui::ProxyEntity>> out_del;
 
-    for (const auto &profile: NekoGui::profileManager->profiles) {
+    for (const auto &[_, profile]: NekoGui::profileManager->profiles) {
         if (NekoGui::dataStore->current_group != profile->gid) continue;
         if (profile->latency < 0) out_del += profile;
     }
@@ -1850,7 +1847,7 @@ bool MainWindow::StopVPNProcess(bool unconditional) {
         ok = p.exitCode() == 0;
 #endif
         if (!unconditional) {
-            ok ? vpn_pid = 0 : MessageBoxWarning(tr("Error"), tr("Failed to stop VPN process"));
+            ok ? vpn_pid = 0 : MessageBoxWarning(tr("Error"), tr("Failed to stop Tun process"));
         }
         return ok;
     }
