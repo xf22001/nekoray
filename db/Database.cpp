@@ -185,7 +185,9 @@ namespace NekoGui {
         } else if (type == "naive") {
             bean = new NekoGui_fmt::NaiveBean();
         } else if (type == "hysteria") {
-            bean = new NekoGui_fmt::HysteriaBean();
+            bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_Hysteria);
+        } else if (type == "tuic") {
+            bean = new NekoGui_fmt::QUICBean(NekoGui_fmt::QUICBean::proxy_TUIC);
         } else if (type == "custom") {
             bean = new NekoGui_fmt::CustomBean();
         } else {
@@ -305,6 +307,7 @@ namespace NekoGui {
         _add(new configItem("id", &id, itemType::integer));
         _add(new configItem("front_proxy_id", &front_proxy_id, itemType::integer));
         _add(new configItem("archive", &archive, itemType::boolean));
+        _add(new configItem("skip_auto_update", &skip_auto_update, itemType::boolean));
         _add(new configItem("name", &name, itemType::string));
         _add(new configItem("order", &order, itemType::integerList));
         _add(new configItem("url", &url, itemType::string));

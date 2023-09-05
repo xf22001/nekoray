@@ -30,6 +30,9 @@
 #ifdef Q_OS_WIN
 #include "3rdparty/WinCommander.hpp"
 #else
+#ifdef Q_OS_LINUX
+#include "sys/linux/LinuxCap.h"
+#endif
 #include <unistd.h>
 #endif
 
@@ -344,6 +347,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     connect(ui->menu_tcp_ping, &QAction::triggered, this, [=]() { speedtest_current_group(0); });
     connect(ui->menu_url_test, &QAction::triggered, this, [=]() { speedtest_current_group(1); });
     connect(ui->menu_full_test, &QAction::triggered, this, [=]() { speedtest_current_group(2); });
+    connect(ui->menu_stop_testing, &QAction::triggered, this, [=]() { speedtest_current_group(114514); });
     //
     auto set_selected_or_group = [=](int mode) {
         // 0=group 1=select 2=unknown(menu is hide)
@@ -355,12 +359,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
                 ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_tcp_ping);
                 ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_url_test);
                 ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_full_test);
+                ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_stop_testing);
                 ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_clear_test_result);
                 ui->menuCurrent_Select->insertAction(ui->actionfake_4, ui->menu_resolve_domain);
             } else {
                 ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_tcp_ping);
                 ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_url_test);
                 ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_full_test);
+                ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_stop_testing);
                 ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_clear_test_result);
                 ui->menuCurrent_Group->insertAction(ui->actionfake_5, ui->menu_resolve_domain);
             }
@@ -433,6 +439,14 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
     t = new QTimer;
     connect(t, &QTimer::timeout, this, [&] { NekoGui_sys::logCounter.fetchAndStoreRelaxed(0); });
     t->start(1000);
+
+    TM_auto_update_subsctiption = new QTimer;
+    TM_auto_update_subsctiption_Reset_Minute = [&](int m) {
+        TM_auto_update_subsctiption->stop();
+        if (m >= 30) TM_auto_update_subsctiption->start(m * 60 * 1000);
+    };
+    connect(TM_auto_update_subsctiption, &QTimer::timeout, this, [&] { UI_update_all_groups(true); });
+    TM_auto_update_subsctiption_Reset_Minute(NekoGui::dataStore->sub_auto_update);
 
     if (!NekoGui::dataStore->flag_tray) show();
 }
@@ -683,6 +697,7 @@ void MainWindow::on_menu_exit_triggered() {
             arguments.removeFirst();
             arguments.removeAll("-tray");
             arguments.removeAll("-flag_restart_tun_on");
+            arguments.removeAll("-flag_reorder");
         }
         auto isLauncher = qEnvironmentVariable("NKR_FROM_LAUNCHER") == "1";
         if (isLauncher) arguments.prepend("--");
@@ -694,7 +709,6 @@ void MainWindow::on_menu_exit_triggered() {
 #ifdef Q_OS_WIN
             WinCommander::runProcessElevated(program, arguments, "", WinCommander::SW_NORMAL, false);
 #else
-            arguments << "-flag_linux_run_core_as_admin";
             QProcess::startDetached(program, arguments);
 #endif
         } else {
@@ -748,19 +762,31 @@ void MainWindow::neko_set_spmode_vpn(bool enable, bool save) {
     if (enable != NekoGui::dataStore->spmode_vpn) {
         if (enable) {
             if (IS_NEKO_BOX_INTERNAL_TUN) {
-                bool requestPermission = !NekoGui::isAdmin();
-#ifdef Q_OS_LINUX
-                if (requestPermission && QProcess::execute("pkexec", {"--help"}) != 0) {
-                    MessageBoxWarning(software_name, "Please install \"pkexec\" first.");
-                    neko_set_spmode_FAILED
-                }
-#endif
+                bool requestPermission = !NekoGui::IsAdmin();
                 if (requestPermission) {
+#ifdef Q_OS_LINUX
+                    if (!Linux_HavePkexec()) {
+                        MessageBoxWarning(software_name, "Please install \"pkexec\" first.");
+                        neko_set_spmode_FAILED
+                    }
+                    auto ret = Linux_Pkexec_SetCapString(NekoGui::FindNekoBoxCoreRealPath(), "cap_net_admin=ep");
+                    if (ret == 0) {
+                        this->exit_reason = 3;
+                        on_menu_exit_triggered();
+                    } else {
+                        MessageBoxWarning(software_name, "Setcap for Tun mode failed.\n\n1. You may canceled the dialog.\n2. You may be using an incompatible environment like AppImage.");
+                        if (QProcessEnvironment::systemEnvironment().contains("APPIMAGE")) {
+                            MW_show_log("If you are using AppImage, it's impossible to start a Tun. Please use other package instead.");
+                        }
+                    }
+#endif
+#ifdef Q_OS_WIN
                     auto n = QMessageBox::warning(GetMessageBoxParent(), software_name, tr("Please run NekoBox as admin"), QMessageBox::Yes | QMessageBox::No);
                     if (n == QMessageBox::Yes) {
                         this->exit_reason = 3;
                         on_menu_exit_triggered();
                     }
+#endif
                     neko_set_spmode_FAILED
                 }
             } else {
@@ -820,9 +846,15 @@ void MainWindow::refresh_status(const QString &traffic_update) {
     refresh_speed_label();
 
     // From UI
+    QString group_name;
+    if (running != nullptr) {
+        auto group = NekoGui::profileManager->GetGroup(running->gid);
+        if (group != nullptr) group_name = group->name;
+    }
+
     if (last_test_time.addSecs(2) < QTime::currentTime()) {
         auto txt = running == nullptr ? tr("Not Running")
-                                      : tr("Running: %1").arg(running->bean->DisplayName().left(50));
+                                      : QString("[%1] %2").arg(group_name, running->bean->DisplayName()).left(30);
         ui->label_running->setText(txt);
     }
     //
@@ -846,17 +878,18 @@ void MainWindow::refresh_status(const QString &traffic_update) {
 
     auto make_title = [=](bool isTray) {
         QStringList tt;
-        if (!isTray && NekoGui::isAdmin()) tt << "[Admin]";
+        if (!isTray && NekoGui::IsAdmin()) tt << "[Admin]";
         if (select_mode) tt << "[" + tr("Select") + "]";
         if (!title_error.isEmpty()) tt << "[" + title_error + "]";
-        if (NekoGui::dataStore->spmode_vpn) tt << "[VPN]";
-        if (NekoGui::dataStore->spmode_system_proxy) tt << "[" + tr("System Proxy") + "]";
+        if (NekoGui::dataStore->spmode_vpn && !NekoGui::dataStore->spmode_system_proxy) tt << "[Tun]";
+        if (!NekoGui::dataStore->spmode_vpn && NekoGui::dataStore->spmode_system_proxy) tt << "[" + tr("System Proxy") + "]";
+        if (NekoGui::dataStore->spmode_vpn && NekoGui::dataStore->spmode_system_proxy) tt << "[Tun+" + tr("System Proxy") + "]";
         tt << software_name;
         if (!isTray) tt << "(" + QString(NKR_VERSION) + ")";
         if (!NekoGui::dataStore->active_routing.isEmpty() && NekoGui::dataStore->active_routing != "Default") {
             tt << "[" + NekoGui::dataStore->active_routing + "]";
         }
-        if (running != nullptr) tt << running->bean->DisplayTypeAndName();
+        if (running != nullptr) tt << running->bean->DisplayTypeAndName() + "@" + group_name;
         return tt.join(isTray ? "\n" : " ");
     };
 

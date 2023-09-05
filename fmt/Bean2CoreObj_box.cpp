@@ -70,12 +70,8 @@ namespace NekoGui_fmt {
             outbound->insert("tls", tls);
         }
 
-        if (!packet_encoding.isEmpty()) {
-            auto pkt = packet_encoding;
-            if (pkt == "packet") pkt = "packetaddr";
-            outbound->insert("packet_encoding", pkt);
-        } else if (outbound->value("type").toString() == "vless") {
-            outbound->insert("packet_encoding", "");
+        if (outbound->value("type").toString() == "vmess" || outbound->value("type").toString() == "vless") {
+            outbound->insert("packet_encoding", packet_encoding);
         }
     }
 
@@ -173,34 +169,47 @@ namespace NekoGui_fmt {
         return result;
     }
 
-    CoreObjOutboundBuildResult HysteriaBean::BuildCoreObjSingBox() {
+    CoreObjOutboundBuildResult QUICBean::BuildCoreObjSingBox() {
         CoreObjOutboundBuildResult result;
 
         QJsonObject coreTlsObj{
             {"enabled", true},
+            {"disable_sni", disableSni},
             {"insecure", allowInsecure},
             {"certificate", caText.trimmed()},
             {"server_name", sni},
         };
-        if (!alpn.trimmed().isEmpty()) coreTlsObj["alpn"] = QJsonArray{alpn};
+        if (!alpn.trimmed().isEmpty()) coreTlsObj["alpn"] = QList2QJsonArray(alpn.split(","));
 
-        QJsonObject coreHysteriaObj{
-            {"type", "hysteria"},
+        QJsonObject outbound{
             {"server", serverAddress},
             {"server_port", serverPort},
-            {"obfs", obfsPassword},
-            {"disable_mtu_discovery", disableMtuDiscovery},
-            {"recv_window", streamReceiveWindow},
-            {"recv_window_conn", connectionReceiveWindow},
-            {"up_mbps", uploadMbps},
-            {"down_mbps", downloadMbps},
             {"tls", coreTlsObj},
         };
 
-        if (authPayloadType == hysteria_auth_base64) coreHysteriaObj["auth"] = authPayload;
-        if (authPayloadType == hysteria_auth_string) coreHysteriaObj["auth_str"] = authPayload;
+        if (proxy_type == proxy_Hysteria) {
+            outbound["type"] = "hysteria";
+            outbound["obfs"] = obfsPassword;
+            outbound["disable_mtu_discovery"] = disableMtuDiscovery;
+            outbound["recv_window"] = streamReceiveWindow;
+            outbound["recv_window_conn"] = connectionReceiveWindow;
+            outbound["up_mbps"] = uploadMbps;
+            outbound["down_mbps"] = downloadMbps;
 
-        result.outbound = coreHysteriaObj;
+            if (!hopPort.trimmed().isEmpty()) outbound["hop_ports"] = hopPort;
+            if (authPayloadType == hysteria_auth_base64) outbound["auth"] = authPayload;
+            if (authPayloadType == hysteria_auth_string) outbound["auth_str"] = authPayload;
+        } else if (proxy_type == proxy_TUIC) {
+            outbound["type"] = "tuic";
+            outbound["uuid"] = uuid;
+            outbound["password"] = password;
+            outbound["congestion_control"] = congestionControl;
+            outbound["udp_relay_mode"] = udpRelayMode;
+            outbound["zero_rtt_handshake"] = zeroRttHandshake;
+            if (!heartbeat.trimmed().isEmpty()) outbound["heartbeat"] = heartbeat;
+        }
+
+        result.outbound = outbound;
         return result;
     }
 

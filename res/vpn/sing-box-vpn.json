@@ -30,6 +30,13 @@
         ],
         "rules": [
             {
+                "query_type": [
+                    32,
+                    33
+                ],
+                "server": "dns-block"
+            },
+            {
                 "domain_suffix": [
                     ".lan"
                 ],
@@ -132,9 +139,10 @@
                     "nekobox_core.exe"
                 ],
                 "outbound": "direct"
-            },
+            }
             //%PROCESS_NAME_RULE%
             //%CIDR_RULE%
+            ,
             {
                 "port": 53,
                 "outbound": "dns-out"

@@ -323,11 +323,16 @@ namespace NekoGui {
                 {"outboundTag", "direct"},
             });
         }
-        dnsServers += QJsonObject{
+        QJsonObject directObj{
             {"address", directDnsAddress.replace("https://", "https+local://")},
             {"queryStrategy", dataStore->routing->direct_dns_strategy},
             {"domains", QList2QJsonArray<QString>(status->domainListDNSDirect)},
         };
+        if (dataStore->routing->def_outbound == "bypass") {
+            dnsServers.prepend(directObj);
+        } else {
+            dnsServers.append(directObj);
+        }
 
         dns["disableFallback"] = true;
         dns["servers"] = dnsServers;
@@ -682,7 +687,7 @@ namespace NekoGui {
                 if (!server.isEmpty()) serverAddress = server;
             }
 
-            if (isFirstProfile && !IsIpAddress(serverAddress)) {
+            if (!IsIpAddress(serverAddress)) {
                 status->domainListDNSDirect += "full:" + serverAddress;
             }
 
@@ -854,17 +859,30 @@ namespace NekoGui {
         // Direct
         auto directDNSAddress = dataStore->routing->direct_dns;
         if (directDNSAddress == "localhost") directDNSAddress = BOX_UNDERLYING_DNS_EXPORT;
-        if (!status->forTest)
-            dnsServers += QJsonObject{
+        if (!status->forTest) {
+            QJsonObject directObj{
                 {"tag", "dns-direct"},
                 {"address_resolver", "dns-local"},
                 {"strategy", dataStore->routing->direct_dns_strategy},
                 {"address", directDNSAddress.replace("+local://", "://")},
                 {"detour", "direct"},
             };
+            if (dataStore->routing->def_outbound == "bypass") {
+                dnsServers.prepend(directObj);
+            } else {
+                dnsServers.append(directObj);
+            }
+        }
+
+        // block
+        if (!status->forTest)
+            dnsServers += QJsonObject{
+                {"tag", "dns-block"},
+                {"address", "rcode://success"},
+            };
 
         // Fakedns
-        if (IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
+        if (dataStore->fake_dns && IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
             dnsServers += QJsonObject{
                 {"tag", "dns-fake"},
                 {"address", "fakeip"},
@@ -893,8 +911,20 @@ namespace NekoGui {
         add_rule_dns(status->domainListDNSRemote, "dns-remote");
         add_rule_dns(status->domainListDNSDirect, "dns-direct");
 
+        // built-in rules
+        if (!status->forTest) {
+            dnsRules += QJsonObject{
+                {"query_type", QJsonArray{32, 33}},
+                {"server", "dns-block"},
+            };
+            dnsRules += QJsonObject{
+                {"domain_suffix", ".lan"},
+                {"server", "dns-block"},
+            };
+        }
+
         // fakedns rule
-        if (IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
+        if (dataStore->fake_dns && IS_NEKO_BOX_INTERNAL_TUN && dataStore->spmode_vpn && !status->forTest) {
             dnsRules += QJsonObject{
                 {"inbound", "tun-in"},
                 {"server", "dns-fake"},

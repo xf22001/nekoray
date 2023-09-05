@@ -5,7 +5,7 @@ namespace NekoGui {
     QString ProfileFilter_ent_key(const std::shared_ptr<NekoGui::ProxyEntity> &ent, bool by_address) {
         by_address &= ent->type != "custom";
         return by_address ? (ent->bean->DisplayAddress() + ent->bean->DisplayType())
-                          : ent->bean->ToJsonBytes();
+                          : QJsonObject2QString(ent->bean->ToJson({"c_cfg", "c_out"}), true) + ent->bean->DisplayType();
     }
 
     void ProfileFilter::Uniq(const QList<std::shared_ptr<ProxyEntity>> &in,
@@ -30,8 +30,9 @@ namespace NekoGui {
 
     void ProfileFilter::Common(const QList<std::shared_ptr<ProxyEntity>> &src,
                                const QList<std::shared_ptr<ProxyEntity>> &dst,
-                               QList<std::shared_ptr<ProxyEntity>> &out,
-                               bool by_address, bool keep_last) {
+                               QList<std::shared_ptr<ProxyEntity>> &outSrc,
+                               QList<std::shared_ptr<ProxyEntity>> &outDst,
+                               bool by_address) {
         QMap<QString, std::shared_ptr<ProxyEntity>> hashMap;
 
         for (const auto &ent: src) {
@@ -41,11 +42,8 @@ namespace NekoGui {
         for (const auto &ent: dst) {
             QString key = ProfileFilter_ent_key(ent, by_address);
             if (hashMap.contains(key)) {
-                if (keep_last) {
-                    out += ent;
-                } else {
-                    out += hashMap[key];
-                }
+                outDst += ent;
+                outSrc += hashMap[key];
             }
         }
     }

@@ -86,7 +86,6 @@ namespace NekoGui {
         bool flag_many = false;
         bool flag_tray = false;
         bool flag_debug = false;
-        bool flag_linux_run_core_as_admin = false;
         bool flag_restart_tun_on = false;
         bool flag_reorder = false;
 
@@ -98,6 +97,7 @@ namespace NekoGui {
         QString test_download_url = "http://cachefly.cachefly.net/10mb.test";
         int test_download_timeout = 30;
         int test_concurrent = 5;
+        bool old_share_link_format = true;
         int traffic_loop_interval = 1000;
         bool connection_statistics = false;
         int current_group = 0; // group id
@@ -121,6 +121,7 @@ namespace NekoGui {
         bool sub_use_proxy = false;
         bool sub_clear = false;
         bool sub_insecure = false;
+        int sub_auto_update = -30;
 
         // Security
         bool skip_cert = false;
@@ -149,7 +150,7 @@ namespace NekoGui {
         int vpn_implementation = 0;
         int vpn_mtu = 9000;
         bool vpn_ipv6 = false;
-        bool vpn_hide_console = false;
+        bool vpn_hide_console = true;
         bool vpn_strict_route = false;
         bool vpn_rule_white = false;
         QString vpn_rule_process = "";

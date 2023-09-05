@@ -12,6 +12,9 @@
 #ifdef Q_OS_WIN
 #include "sys/windows/guihelper.h"
 #else
+#ifdef Q_OS_LINUX
+#include <sys/linux/LinuxCap.h>
+#endif
 #include <unistd.h>
 #endif
 
@@ -62,10 +65,11 @@ namespace NekoGui_ConfigItem {
         }
     }
 
-    QJsonObject JsonStore::ToJson() {
+    QJsonObject JsonStore::ToJson(const QStringList &without) {
         QJsonObject object;
         for (const auto &_item: _map) {
             auto item = _item.get();
+            if (without.contains(item->name)) continue;
             switch (item->type) {
                 case itemType::string:
                     // Allow Empty
@@ -271,6 +275,7 @@ namespace NekoGui {
         _add(new configItem("sp_format", &system_proxy_format, itemType::string));
         _add(new configItem("sub_clear", &sub_clear, itemType::boolean));
         _add(new configItem("sub_insecure", &sub_insecure, itemType::boolean));
+        _add(new configItem("sub_auto_update", &sub_auto_update, itemType::integer));
         _add(new configItem("enable_js_hook", &enable_js_hook, itemType::integer));
         _add(new configItem("log_ignore", &log_ignore, itemType::stringList));
         _add(new configItem("start_minimal", &start_minimal, itemType::boolean));
@@ -406,6 +411,8 @@ namespace NekoGui {
         return !username.trimmed().isEmpty() && !password.trimmed().isEmpty();
     }
 
+    // System Utils
+
     QString FindCoreAsset(const QString &name) {
         QStringList search{NekoGui::dataStore->v2ray_asset_dir};
         search << QApplication::applicationDirPath();
@@ -427,15 +434,26 @@ namespace NekoGui {
         return {};
     }
 
+    QString FindNekoBoxCoreRealPath() {
+        auto fn = QApplication::applicationDirPath() + "/nekobox_core";
+        auto fi = QFileInfo(fn);
+        if (fi.isSymLink()) return fi.symLinkTarget();
+        return fn;
+    }
+
     short isAdminCache = -1;
 
-    bool isAdmin() {
+    // IsAdmin 主要判断：有无权限启动 Tun
+    bool IsAdmin() {
         if (isAdminCache >= 0) return isAdminCache;
 
-        auto admin = NekoGui::dataStore->flag_linux_run_core_as_admin;
+        bool admin = false;
 #ifdef Q_OS_WIN
         admin = Windows_IsInAdmin();
 #else
+#ifdef Q_OS_LINUX
+        admin |= Linux_GetCapString(FindNekoBoxCoreRealPath()).contains("cap_net_admin");
+#endif
         admin |= geteuid() == 0;
 #endif
 

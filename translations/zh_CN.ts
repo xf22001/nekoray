@@ -164,6 +164,14 @@
         <translation>高级系统代理设置。请选择一种格式。</translation>
     </message>
     <message>
+        <source>Old Share Link Format</source>
+        <translation>旧分享链接格式</translation>
+    </message>
+    <message>
+        <source>Share VMess Link with v2rayN Format</source>
+        <translation>用 v2rayN 的格式分享 VMess 链接</translation>
+    </message>
+    <message>
         <source>Clear servers before updating subscription</source>
         <translation>更新订阅前清除服务器</translation>
     </message>
@@ -243,6 +251,14 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
         <source>Timeout (s)</source>
         <translation>超时（秒）</translation>
     </message>
+    <message>
+        <source>Automatic update</source>
+        <translation>自动更新订阅</translation>
+    </message>
+    <message>
+        <source>Interval (minute, invalid if less than 30)</source>
+        <translation>时间间隔（分钟，少于 30 分钟无效）</translation>
+    </message>
 </context>
 <context>
     <name>DialogEditGroup</name>
@@ -309,6 +325,18 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
     <message>
         <source>Clear</source>
         <translation>清除</translation>
+    </message>
+    <message>
+        <source>Skip automatic update</source>
+        <translation>跳过自动更新</translation>
+    </message>
+    <message>
+        <source>Common</source>
+        <translation>通用</translation>
+    </message>
+    <message>
+        <source>Share</source>
+        <translation>分享</translation>
     </message>
 </context>
 <context>
@@ -836,7 +864,38 @@ This needs to be run NekoBox with administrator privileges.</source>
     </message>
 </context>
 <context>
-    <name>EditHysteria</name>
+    <name>EditNaive</name>
+    <message>
+        <source>Protocol</source>
+        <translation>协议</translation>
+    </message>
+    <message>
+        <source>Password</source>
+        <translation>密码</translation>
+    </message>
+    <message>
+        <source>Extra headers</source>
+        <translation>附加标头</translation>
+    </message>
+    <message>
+        <source>SNI</source>
+        <translation></translation>
+    </message>
+    <message>
+        <source>Username</source>
+        <translation>用户名</translation>
+    </message>
+    <message>
+        <source>Certificate</source>
+        <translation>证书</translation>
+    </message>
+    <message>
+        <source>Insecure concurrency</source>
+        <translation>不安全并发</translation>
+    </message>
+</context>
+<context>
+    <name>EditQUIC</name>
     <message>
         <source>Certificate</source>
         <translation>证书</translation>
@@ -885,36 +944,33 @@ This needs to be run NekoBox with administrator privileges.</source>
         <source>Auth Payload</source>
         <translation>认证有效载荷</translation>
     </message>
-</context>
-<context>
-    <name>EditNaive</name>
     <message>
-        <source>Protocol</source>
-        <translation>协议</translation>
+        <source>Generate UUID</source>
+        <translation>生成 UUID</translation>
     </message>
     <message>
         <source>Password</source>
         <translation>密码</translation>
     </message>
     <message>
-        <source>Extra headers</source>
-        <translation>附加标头</translation>
+        <source>Zero Rtt Handshake</source>
+        <translation>0-Rtt 握手</translation>
     </message>
     <message>
-        <source>SNI</source>
-        <translation></translation>
+        <source>UDP Relay Mode</source>
+        <translation>UDP 中继模式</translation>
     </message>
     <message>
-        <source>Username</source>
-        <translation>用户名</translation>
+        <source>Congestion Control</source>
+        <translation>拥塞控制</translation>
     </message>
     <message>
-        <source>Certificate</source>
-        <translation>证书</translation>
+        <source>Heartbeat</source>
+        <translation>心跳包发送间隔</translation>
     </message>
     <message>
-        <source>Insecure concurrency</source>
-        <translation>不安全并发</translation>
+        <source>Disable SNI</source>
+        <translation>不发送服务器名称指示</translation>
     </message>
 </context>
 <context>
@@ -1162,10 +1218,6 @@ This needs to be run NekoBox with administrator privileges.</source>
         <translation>错误</translation>
     </message>
     <message>
-        <source>Default</source>
-        <translation type="vanished">默认</translation>
-    </message>
-    <message>
         <source>Confirmation</source>
         <translation>确认</translation>
     </message>
@@ -1176,10 +1228,6 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Imported %1 profile(s)</source>
         <translation>导入了 %1 个配置</translation>
-    </message>
-    <message>
-        <source>Running: %1</source>
-        <translation>正在运行: %1</translation>
     </message>
     <message>
         <source>None</source>
@@ -1352,8 +1400,8 @@ End: %2</source>
         <translation>启用系统代理</translation>
     </message>
     <message>
-        <source>Enable VPN</source>
-        <translation>启用 VPN</translation>
+        <source>Enable Tun</source>
+        <translation>启用 Tun</translation>
     </message>
     <message>
         <source>Tun Settings changed</source>
@@ -1512,6 +1560,10 @@ Split by line.</source>
     <message>
         <source>Test Options</source>
         <translation>测试选项</translation>
+    </message>
+    <message>
+        <source>Stop Testing</source>
+        <translation>停止测试</translation>
     </message>
 </context>
 <context>
