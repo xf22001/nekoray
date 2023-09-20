@@ -724,6 +724,10 @@ If the default value does not work, try changing it to &quot;223.5.5.5&quot;.
 For more information, see the document &quot;Configuration/DNS&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Final DNS Out</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogVPNSettings</name>
@@ -892,6 +896,14 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</translation>
         <source>Insecure concurrency</source>
         <translation></translation>
     </message>
+    <message>
+        <source>Disable logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on this option if your connection is lost after a while</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditQUIC</name>
@@ -970,6 +982,10 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</translation>
     <message>
         <source>UDP Relay Mode</source>
         <translation>Режим UDP Relay</translation>
+    </message>
+    <message>
+        <source>Force use external core</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>

@@ -725,6 +725,10 @@ For more information, see the document &quot;Configuration/DNS&quot;.</source>
 如果默认值不工作，可以尝试更改为 &quot;223.5.5.5&quot;。
 更多信息，请参阅文档 &quot;配置/DNS&quot;。</translation>
     </message>
+    <message>
+        <source>Final DNS Out</source>
+        <translation>默认 DNS 出站</translation>
+    </message>
 </context>
 <context>
     <name>DialogVPNSettings</name>
@@ -893,6 +897,14 @@ This needs to be run NekoBox with administrator privileges.</source>
         <source>Insecure concurrency</source>
         <translation>不安全并发</translation>
     </message>
+    <message>
+        <source>Disable logs</source>
+        <translation>关闭日志</translation>
+    </message>
+    <message>
+        <source>Turn on this option if your connection is lost after a while</source>
+        <translation>如果连接一段时间后出现中断，请打开此选项</translation>
+    </message>
 </context>
 <context>
     <name>EditQUIC</name>
@@ -971,6 +983,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Disable SNI</source>
         <translation>不发送服务器名称指示</translation>
+    </message>
+    <message>
+        <source>Force use external core</source>
+        <translation>强制使用外部核心</translation>
     </message>
 </context>
 <context>

@@ -328,7 +328,7 @@ namespace NekoGui {
             {"queryStrategy", dataStore->routing->direct_dns_strategy},
             {"domains", QList2QJsonArray<QString>(status->domainListDNSDirect)},
         };
-        if (dataStore->routing->def_outbound == "bypass") {
+        if (dataStore->routing->dns_final_out == "bypass") {
             dnsServers.prepend(directObj);
         } else {
             dnsServers.append(directObj);
@@ -578,7 +578,7 @@ namespace NekoGui {
             if (thisExternalStat > 0) {
                 auto extR = ent->bean->BuildExternal(ext_mapping_port, ext_socks_port, thisExternalStat);
                 if (extR.program.isEmpty()) {
-                    status->result->error = QObject::tr("Core not found: %1").arg(ent->bean->DisplayType());
+                    status->result->error = QObject::tr("Core not found: %1").arg(ent->bean->DisplayCoreType());
                     return {};
                 }
                 if (!extR.error.isEmpty()) { // rejected
@@ -867,7 +867,7 @@ namespace NekoGui {
                 {"address", directDNSAddress.replace("+local://", "://")},
                 {"detour", "direct"},
             };
-            if (dataStore->routing->def_outbound == "bypass") {
+            if (dataStore->routing->dns_final_out == "bypass") {
                 dnsServers.prepend(directObj);
             } else {
                 dnsServers.append(directObj);

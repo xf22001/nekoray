@@ -721,6 +721,10 @@ If the default value does not work, try changing it to &quot;223.5.5.5&quot;.
 For more information, see the document &quot;Configuration/DNS&quot;.</source>
         <translation type="unfinished"></translation>
     </message>
+    <message>
+        <source>Final DNS Out</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>DialogVPNSettings</name>
@@ -885,6 +889,14 @@ This needs to be run NekoBox with administrator privileges.</source>
         <source>Insecure concurrency</source>
         <translation>همزمانی ناامن</translation>
     </message>
+    <message>
+        <source>Disable logs</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Turn on this option if your connection is lost after a while</source>
+        <translation type="unfinished"></translation>
+    </message>
 </context>
 <context>
     <name>EditQUIC</name>
@@ -962,6 +974,10 @@ This needs to be run NekoBox with administrator privileges.</source>
     </message>
     <message>
         <source>UDP Relay Mode</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <source>Force use external core</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -7,9 +7,12 @@ namespace NekoGui_fmt {
     public:
         static constexpr int proxy_Hysteria = 0;
         static constexpr int proxy_TUIC = 1;
+        static constexpr int proxy_Hysteria2 = 3;
         int proxy_type = proxy_Hysteria;
 
-        // Hysteria
+        bool forceExternal = false;
+
+        // Hysteria 1
 
         static constexpr int hysteria_protocol_udp = 0;
         static constexpr int hysteria_protocol_facktcp = 1;
@@ -20,8 +23,10 @@ namespace NekoGui_fmt {
         static constexpr int hysteria_auth_string = 1;
         static constexpr int hysteria_auth_base64 = 2;
         int authPayloadType = 0;
-
         QString authPayload = "";
+
+        // Hysteria 1&2
+
         QString obfsPassword = "";
 
         int uploadMbps = 100;
@@ -37,11 +42,15 @@ namespace NekoGui_fmt {
         // TUIC
 
         QString uuid = "";
-        QString password = "";
         QString congestionControl = "bbr";
         QString udpRelayMode = "native";
         bool zeroRttHandshake = false;
         QString heartbeat = "10s";
+        bool uos = false;
+
+        // HY2&TUIC
+
+        QString password = "";
 
         // TLS
 
@@ -53,9 +62,7 @@ namespace NekoGui_fmt {
 
         explicit QUICBean(int _proxy_type) : AbstractBean(0) {
             proxy_type = _proxy_type;
-            if (proxy_type == proxy_Hysteria) {
-                _add(new configItem("protocol", &hyProtocol, itemType::integer));
-                _add(new configItem("authPayloadType", &authPayloadType, itemType::integer));
+            if (proxy_type == proxy_Hysteria || proxy_type == proxy_Hysteria2) {
                 _add(new configItem("authPayload", &authPayload, itemType::string));
                 _add(new configItem("obfsPassword", &obfsPassword, itemType::string));
                 _add(new configItem("uploadMbps", &uploadMbps, itemType::integer));
@@ -65,6 +72,14 @@ namespace NekoGui_fmt {
                 _add(new configItem("disableMtuDiscovery", &disableMtuDiscovery, itemType::boolean));
                 _add(new configItem("hopInterval", &hopInterval, itemType::integer));
                 _add(new configItem("hopPort", &hopPort, itemType::string));
+                if (proxy_type == proxy_Hysteria) { // hy1
+                    _add(new configItem("authPayloadType", &authPayloadType, itemType::integer));
+                    _add(new configItem("protocol", &hyProtocol, itemType::integer));
+                } else { // hy2
+                    uploadMbps = 0;
+                    downloadMbps = 0;
+                    _add(new configItem("password", &password, itemType::string));
+                }
             } else if (proxy_type == proxy_TUIC) {
                 _add(new configItem("uuid", &uuid, itemType::string));
                 _add(new configItem("password", &password, itemType::string));
@@ -72,7 +87,9 @@ namespace NekoGui_fmt {
                 _add(new configItem("udpRelayMode", &udpRelayMode, itemType::string));
                 _add(new configItem("zeroRttHandshake", &zeroRttHandshake, itemType::boolean));
                 _add(new configItem("heartbeat", &heartbeat, itemType::string));
+                _add(new configItem("uos", &uos, itemType::boolean));
             }
+            _add(new configItem("forceExternal", &forceExternal, itemType::boolean));
             // TLS
             _add(new configItem("allowInsecure", &allowInsecure, itemType::boolean));
             _add(new configItem("sni", &sni, itemType::string));
@@ -86,9 +103,27 @@ namespace NekoGui_fmt {
             return ::DisplayAddress(serverAddress, serverPort);
         }
 
-        QString DisplayCoreType() override { return NeedExternal(true) == 0 ? software_core_name : "Hysteria"; };
+        QString DisplayCoreType() override {
+            if (NeedExternal(true) == 0) {
+                return software_core_name;
+            } else if (proxy_type == proxy_TUIC) {
+                return "tuic";
+            } else if (proxy_type == proxy_Hysteria) {
+                return "hysteria";
+            } else {
+                return "hysteria2";
+            }
+        }
 
-        QString DisplayType() override { return proxy_type == proxy_TUIC ? "TUIC" : "Hysteria"; };
+        QString DisplayType() override {
+            if (proxy_type == proxy_TUIC) {
+                return "TUIC";
+            } else if (proxy_type == proxy_Hysteria) {
+                return "Hysteria1";
+            } else {
+                return "Hysteria2";
+            }
+        };
 
         int NeedExternal(bool isFirstProfile) override;
 

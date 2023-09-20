@@ -21,6 +21,7 @@ namespace NekoGui {
         bool dns_routing = true;
         bool use_dns_object = false;
         QString dns_object = "";
+        QString dns_final_out = "proxy";
 
         // Misc
         QString domain_strategy = "AsIs";
@@ -136,7 +137,7 @@ namespace NekoGui {
         // Socks & HTTP Inbound
         QString inbound_address = "127.0.0.1";
         int inbound_socks_port = 2080; // or Mixed
-        int inbound_http_port = -2081;
+        int inbound_http_port = 2081;
         InboundAuthorization *inbound_auth = new InboundAuthorization;
         QString custom_inbound = "{\"inbounds\": []}";
 

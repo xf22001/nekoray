@@ -57,6 +57,7 @@ namespace NekoGui_fmt {
             if (!stream->path.isEmpty()) query.addQueryItem("serviceName", stream->path);
         } else if (stream->network == "tcp") {
             if (stream->header_type == "http") {
+                if (!stream->path.isEmpty()) query.addQueryItem("path", stream->path);
                 query.addQueryItem("headerType", "http");
                 query.addQueryItem("host", stream->host);
             }
@@ -212,6 +213,26 @@ namespace NekoGui_fmt {
             if (!udpRelayMode.isEmpty()) q.addQueryItem("udp_relay_mode", udpRelayMode);
             if (allowInsecure) q.addQueryItem("allow_insecure", "1");
             if (disableSni) q.addQueryItem("disable_sni", "1");
+            if (!q.isEmpty()) url.setQuery(q);
+            if (!name.isEmpty()) url.setFragment(name);
+        } else if (proxy_type == proxy_Hysteria2) {
+            url.setScheme("hy2");
+            url.setHost(serverAddress);
+            url.setPort(serverPort);
+            if (password.contains(":")) {
+                url.setUserName(SubStrBefore(password, ":"));
+                url.setPassword(SubStrAfter(password, ":"));
+            } else {
+                url.setUserName(password);
+            }
+            QUrlQuery q;
+            if (!obfsPassword.isEmpty()) {
+                q.addQueryItem("obfs", "salamander");
+                q.addQueryItem("obfs-password", obfsPassword);
+            }
+            // if (!hopPort.trimmed().isEmpty()) q.addQueryItem("mport", hopPort);
+            if (allowInsecure) q.addQueryItem("insecure", "1");
+            if (!sni.isEmpty()) q.addQueryItem("sni", sni);
             if (!q.isEmpty()) url.setQuery(q);
             if (!name.isEmpty()) url.setFragment(name);
         }
