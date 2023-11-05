@@ -26,6 +26,7 @@ require (
 	github.com/go-chi/render v1.0.2 // indirect
 	github.com/go-ole/go-ole v1.2.6 // indirect
 	github.com/go-task/slim-sprig v0.0.0-20210107165309-348f09dbbbc0 // indirect
+	github.com/gofrs/uuid v4.4.0+incompatible // indirect
 	github.com/gofrs/uuid/v5 v5.0.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/btree v1.1.2 // indirect
@@ -58,9 +59,7 @@ require (
 	github.com/sagernet/reality v0.0.0-20230406110435-ee17307e7691 // indirect
 	github.com/sagernet/sing v0.2.8-0.20230707055657-7c9b4d624da7 // indirect
 	github.com/sagernet/sing-dns v0.1.7-0.20230703131656-fd65b6178bf9 // indirect
-	github.com/sagernet/sing-mux v0.1.1-0.20230703132253-2cedde0fbc90 // indirect
 	github.com/sagernet/sing-shadowsocks v0.2.3-0.20230703131347-b044960bd355 // indirect
-	github.com/sagernet/sing-shadowsocks2 v0.1.2-0.20230703131506-ca0c6adde968 // indirect
 	github.com/sagernet/sing-shadowtls v0.1.3-0.20230703132509-93bbad3057e4 // indirect
 	github.com/sagernet/sing-tun v0.1.9-0.20230703134424-fd850d00e5cd // indirect
 	github.com/sagernet/sing-vmess v0.1.7-0.20230703132834-48803e0fd8af // indirect
@@ -91,6 +90,7 @@ require (
 	google.golang.org/genproto v0.0.0-20230410155749-daa745c078e1 // indirect
 	google.golang.org/grpc v1.56.1 // indirect
 	google.golang.org/protobuf v1.31.0 // indirect
+	gvisor.dev/gvisor v0.0.0-20220901235040-6ca97ef2ce1c // indirect
 	lukechampine.com/blake3 v1.2.1 // indirect
 )
 

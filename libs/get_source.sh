@@ -24,7 +24,7 @@ if [ ! -d "v2ray-core" ]; then
   git clone --no-checkout https://github.com/MatsuriDayo/v2ray-core.git
 fi
 pushd v2ray-core
-git checkout "$COMMIT_MATSURI_V2RAY"
+#git checkout "$COMMIT_MATSURI_V2RAY"
 popd
 
 popd
