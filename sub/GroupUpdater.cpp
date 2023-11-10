@@ -70,7 +70,6 @@ namespace NekoGui_sub {
             auto j = DecodeB64IfValid(link.fragment().toUtf8(), QByteArray::Base64UrlEncoding);
             if (j.isEmpty()) return;
             ent->bean->FromJsonBytes(j);
-            MW_show_log("nekoray format: " + ent->bean->DisplayTypeAndName());
         }
 
         // SOCKS
@@ -308,6 +307,9 @@ namespace NekoGui_sub {
                     bean->stream->alpn = Node2QStringList(proxy["alpn"]).join(",");
                     bean->stream->allow_insecure = Node2Bool(proxy["skip-cert-verify"]);
                     bean->stream->utlsFingerprint = Node2QString(proxy["client-fingerprint"]);
+                    if (bean->stream->utlsFingerprint.isEmpty()) {
+                        bean->stream->utlsFingerprint = NekoGui::dataStore->utlsFingerprint;
+                    }
 
                     // sing-mux
                     auto smux = NodeChild(proxy, {"smux"});
@@ -348,6 +350,11 @@ namespace NekoGui_sub {
                     bean->stream->alpn = Node2QStringList(proxy["alpn"]).join(",");
                     if (Node2Bool(proxy["tls"])) bean->stream->security = "tls";
                     if (Node2Bool(proxy["skip-cert-verify"])) bean->stream->allow_insecure = true;
+                    bean->stream->utlsFingerprint = Node2QString(proxy["client-fingerprint"]);
+                    bean->stream->utlsFingerprint = Node2QString(proxy["client-fingerprint"]);
+                    if (bean->stream->utlsFingerprint.isEmpty()) {
+                        bean->stream->utlsFingerprint = NekoGui::dataStore->utlsFingerprint;
+                    }
 
                     // sing-mux
                     auto smux = NodeChild(proxy, {"smux"});
@@ -369,6 +376,10 @@ namespace NekoGui_sub {
                         bean->stream->path = Node2QString(ws["path"]);
                         bean->stream->ws_early_data_length = Node2Int(ws["max-early-data"]);
                         bean->stream->ws_early_data_name = Node2QString(ws["early-data-header-name"]);
+                        // for Xray
+                        if (Node2QString(ws["early-data-header-name"]) == "Sec-WebSocket-Protocol") {
+                            bean->stream->path += "?ed=" + Node2QString(ws["max-early-data"]);
+                        }
                     }
 
                     auto grpc = NodeChild(proxy, {"grpc-opts", "grpc-opt"});
@@ -434,6 +445,20 @@ namespace NekoGui_sub {
                     auto downMbps = Node2QString(proxy["down"]).split(" ")[0].toInt();
                     if (upMbps > 0) bean->uploadMbps = upMbps;
                     if (downMbps > 0) bean->downloadMbps = downMbps;
+                } else if (type == "hysteria2") {
+                    auto bean = ent->QUICBean();
+
+                    bean->hopPort = Node2QString(proxy["ports"]);
+
+                    bean->allowInsecure = Node2Bool(proxy["skip-cert-verify"]);
+                    bean->caText = Node2QString(proxy["ca-str"]);
+                    bean->sni = Node2QString(proxy["sni"]);
+
+                    bean->obfsPassword = Node2QString(proxy["obfs-password"]);
+                    bean->password = Node2QString(proxy["password"]);
+
+                    bean->uploadMbps = Node2QString(proxy["up"]).split(" ")[0].toInt();
+                    bean->downloadMbps = Node2QString(proxy["down"]).split(" ")[0].toInt();
                 } else if (type == "tuic") {
                     auto bean = ent->QUICBean();
 

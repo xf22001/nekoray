@@ -645,6 +645,9 @@ namespace NekoGui {
                     needMux = false;
                 }
             }
+            if (ent->type == "vless" && outbound["flow"] != "") {
+                needMux = false;
+            }
 
             // common
             if (IS_NEKO_BOX) {
@@ -959,12 +962,12 @@ namespace NekoGui {
         };
 
         // final add user rule
-        add_rule_route(status->ipListBlock, true, "block");
-        add_rule_route(status->ipListRemote, true, tagProxy);
-        add_rule_route(status->ipListDirect, true, "bypass");
         add_rule_route(status->domainListBlock, false, "block");
         add_rule_route(status->domainListRemote, false, tagProxy);
         add_rule_route(status->domainListDirect, false, "bypass");
+        add_rule_route(status->ipListBlock, true, "block");
+        add_rule_route(status->ipListRemote, true, tagProxy);
+        add_rule_route(status->ipListDirect, true, "bypass");
 
         // built-in rules
         status->routingRules += QJsonObject{

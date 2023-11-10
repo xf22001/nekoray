@@ -38,6 +38,7 @@ namespace NekoGui_fmt {
         query.addQueryItem("security", security);
 
         if (!stream->sni.isEmpty()) query.addQueryItem("sni", stream->sni);
+        if (!stream->alpn.isEmpty()) query.addQueryItem("alpn", stream->alpn);
         if (stream->allow_insecure) query.addQueryItem("allowInsecure", "1");
         if (!stream->utlsFingerprint.isEmpty()) query.addQueryItem("fp", stream->utlsFingerprint);
 
@@ -50,7 +51,7 @@ namespace NekoGui_fmt {
         // type
         query.addQueryItem("type", stream->network);
 
-        if (stream->network == "ws" || stream->network == "http") {
+        if (stream->network == "ws" || stream->network == "http" || stream->network == "httpupgrade") {
             if (!stream->path.isEmpty()) query.addQueryItem("path", stream->path);
             if (!stream->host.isEmpty()) query.addQueryItem("host", stream->host);
         } else if (stream->network == "grpc") {
@@ -136,7 +137,11 @@ namespace NekoGui_fmt {
 
             if (!stream->sni.isEmpty()) query.addQueryItem("sni", stream->sni);
             if (stream->allow_insecure) query.addQueryItem("allowInsecure", "1");
-            if (!stream->utlsFingerprint.isEmpty()) query.addQueryItem("fp", stream->utlsFingerprint);
+            if (stream->utlsFingerprint.isEmpty()) {
+                query.addQueryItem("fp", NekoGui::dataStore->utlsFingerprint);
+            } else {
+                query.addQueryItem("fp", stream->utlsFingerprint);
+            }
 
             if (security == "reality") {
                 query.addQueryItem("pbk", stream->reality_pbk);
@@ -147,7 +152,7 @@ namespace NekoGui_fmt {
             // type
             query.addQueryItem("type", stream->network);
 
-            if (stream->network == "ws" || stream->network == "http") {
+            if (stream->network == "ws" || stream->network == "http" || stream->network == "httpupgrade") {
                 if (!stream->path.isEmpty()) query.addQueryItem("path", stream->path);
                 if (!stream->host.isEmpty()) query.addQueryItem("host", stream->host);
             } else if (stream->network == "grpc") {
@@ -230,7 +235,7 @@ namespace NekoGui_fmt {
                 q.addQueryItem("obfs", "salamander");
                 q.addQueryItem("obfs-password", obfsPassword);
             }
-            // if (!hopPort.trimmed().isEmpty()) q.addQueryItem("mport", hopPort);
+            if (!hopPort.trimmed().isEmpty()) q.addQueryItem("mport", hopPort);
             if (allowInsecure) q.addQueryItem("insecure", "1");
             if (!sni.isEmpty()) q.addQueryItem("sni", sni);
             if (!q.isEmpty()) url.setQuery(q);

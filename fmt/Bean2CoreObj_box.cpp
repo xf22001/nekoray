@@ -28,6 +28,9 @@ namespace NekoGui_fmt {
                 if (!host.isEmpty()) transport["host"] = QList2QJsonArray(host.split(","));
             } else if (network == "grpc") {
                 if (!path.isEmpty()) transport["service_name"] = path;
+            } else if (network == "httpupgrade") {
+                if (!path.isEmpty()) transport["path"] = path;
+                if (!host.isEmpty()) transport["host"] = host;
             }
             outbound->insert("transport", transport);
         } else if (header_type == "http") {
@@ -52,14 +55,14 @@ namespace NekoGui_fmt {
             if (!alpn.trimmed().isEmpty()) {
                 tls["alpn"] = QList2QJsonArray(alpn.split(","));
             }
-            auto fp = utlsFingerprint.isEmpty() ? NekoGui::dataStore->utlsFingerprint : utlsFingerprint;
+            QString fp = utlsFingerprint;
             if (!reality_pbk.trimmed().isEmpty()) {
                 tls["reality"] = QJsonObject{
                     {"enabled", true},
                     {"public_key", reality_pbk},
                     {"short_id", reality_sid.split(",")[0]},
                 };
-                if (fp.isEmpty()) fp = "chrome";
+                if (fp.isEmpty()) fp = "random";
             }
             if (!fp.isEmpty()) {
                 tls["utls"] = QJsonObject{
@@ -197,7 +200,10 @@ namespace NekoGui_fmt {
             outbound["up_mbps"] = uploadMbps;
             outbound["down_mbps"] = downloadMbps;
 
-            if (!hopPort.trimmed().isEmpty()) outbound["hop_ports"] = hopPort;
+            if (!hopPort.trimmed().isEmpty()) {
+                outbound["hop_ports"] = hopPort;
+                outbound["hop_interval"] = hopInterval;
+            }
             if (authPayloadType == hysteria_auth_base64) outbound["auth"] = authPayload;
             if (authPayloadType == hysteria_auth_string) outbound["auth_str"] = authPayload;
         } else if (proxy_type == proxy_Hysteria2) {
@@ -205,6 +211,11 @@ namespace NekoGui_fmt {
             outbound["password"] = password;
             outbound["up_mbps"] = uploadMbps;
             outbound["down_mbps"] = downloadMbps;
+            
+            if (!hopPort.trimmed().isEmpty()) {
+                outbound["hop_ports"] = hopPort;
+                outbound["hop_interval"] = hopInterval;
+            }
             if (!obfsPassword.isEmpty()) {
                 outbound["obfs"] = QJsonObject{
                     {"type", "salamander"},
