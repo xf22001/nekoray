@@ -27,4 +27,13 @@ pushd v2ray-core
 #git checkout "$COMMIT_MATSURI_V2RAY"
 popd
 
+####
+#deps for sing-box
+if [ ! -d "sing" ]; then
+  git clone --no-checkout https://github.com/SagerNet/sing.git
+fi
+pushd sing
+git checkout "$COMMIT_SING"
+popd
+
 popd
