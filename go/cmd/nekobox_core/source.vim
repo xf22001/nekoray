@@ -1,0 +1,1 @@
+GoBuildTags with_clash_api,with_gvisor,with_quic,with_wireguard,with_utls,with_ech
