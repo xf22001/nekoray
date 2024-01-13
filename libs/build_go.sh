@@ -12,7 +12,7 @@ if [ -z $DEST ]; then
   echo "Please set GOOS GOARCH"
   exit 1
 fi
-rm -rf $DEST
+# rm -rf $DEST
 mkdir -p $DEST
 
 export CGO_ENABLED=0
