@@ -25,18 +25,18 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
       - name: Go Status
         run: git ls-files go | xargs cat | sha1sum > go_status
       - name: Cache Common Download
         id: cache-common
-        uses: actions/cache@v3
+        uses: actions/cache@master
         with:
           path: artifacts.tgz
           key: CommonCache-${{ matrix.cross_os }}-${{ matrix.cross_arch }}-${{ hashFiles('libs/*.sh', 'go_status', '*.txt') }}
       - name: Install Golang
         if: steps.cache-common.outputs.cache-hit != 'true'
-        uses: actions/setup-go@v3
+        uses: actions/setup-go@master
         with:
           go-version: ^1.21
       - name: Build golang parts
@@ -72,7 +72,7 @@ jobs:
       ACTIONS_ALLOW_UNSECURE_COMMANDS: true
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
         with:
           submodules: "recursive"
       - name: Install MSVC compiler
@@ -91,10 +91,10 @@ jobs:
         run: bash ./libs/download_qtsdk_win.sh
       # ========================================================================================================= 编译与 Qt 无关的依赖
       - name: Install ninja-build tool
-        uses: seanmiddleditch/gha-setup-ninja@v3
+        uses: seanmiddleditch/gha-setup-ninja@master
       - name: Cache Download
         id: cache-deps
-        uses: actions/cache@v3
+        uses: actions/cache@master
         with:
           path: libs/deps
           key: DepsCache-${{ matrix.platform }}-${{ matrix.arch }}-${{ hashFiles('libs/build_deps_*.sh') }}-Qt${{ matrix.qt_version }}
@@ -154,7 +154,7 @@ jobs:
       - build-go
     steps:
       - name: Checking out sources
-        uses: actions/checkout@v3
+        uses: actions/checkout@master
       - name: Download Artifacts
         uses: actions/download-artifact@master
         with:
