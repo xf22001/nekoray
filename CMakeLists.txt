@@ -30,9 +30,7 @@ if (NKR_CROSS)
 endif ()
 
 #### Platform Variables ####
-if (APPLE)
-    include("cmake/macos/macos.cmake")
-elseif (WIN32)
+if (WIN32)
     include("cmake/windows/windows.cmake")
 else ()
     include("cmake/linux/linux.cmake")
@@ -65,10 +63,6 @@ include("cmake/nkr.cmake")
 
 find_package(Threads)
 
-if (NKR_PACKAGE OR NKR_PACKAGE_MACOS)
-    nkr_add_compile_definitions(NKR_CPP_USE_APPDATA)
-endif ()
-
 #### NKR EXTERNAL ####
 
 if (NKR_NO_EXTERNAL)
@@ -76,15 +70,6 @@ if (NKR_NO_EXTERNAL)
     set(NKR_NO_YAML 1)
     set(NKR_NO_ZXING 1)
     set(NKR_NO_QHOTKEY 1)
-    set(NKR_NO_QUICKJS 1)
-endif ()
-
-# quickjs (static submodule)
-if (NKR_NO_QUICKJS)
-    nkr_add_compile_definitions(NKR_NO_QUICKJS)
-else ()
-    add_subdirectory(3rdparty/qjs)
-    list(APPEND NKR_EXTERNAL_TARGETS quickjs)
 endif ()
 
 # grpc
@@ -140,7 +125,6 @@ set(PROJECT_SOURCES
         main/main.cpp
         main/NekoGui.cpp
         main/NekoGui_Utils.cpp
-        main/QJS.cpp
         main/HTTPRequestHelper.cpp
 
         3rdparty/base64.cpp
@@ -166,7 +150,6 @@ set(PROJECT_SOURCES
         db/ConfigBuilder.cpp
 
         fmt/AbstractBean.cpp
-        fmt/Bean2CoreObj_ray.cpp
         fmt/Bean2CoreObj_box.cpp
         fmt/Bean2External.cpp
         fmt/Bean2Link.cpp
@@ -241,10 +224,6 @@ set(PROJECT_SOURCES
         ui/dialog_hotkey.h
         ui/dialog_hotkey.ui
 
-        ui/dialog_first_setup.cpp
-        ui/dialog_first_setup.h
-        ui/dialog_first_setup.ui
-
         ui/widget/ProxyItem.cpp
         ui/widget/ProxyItem.h
         ui/widget/ProxyItem.ui
@@ -287,18 +266,7 @@ set_property(TARGET nekoray PROPERTY AUTOUIC ON)
 set_property(TARGET nekoray PROPERTY AUTOMOC ON)
 set_property(TARGET nekoray PROPERTY AUTORCC ON)
 
-# Target Source macOS
-
-set(MACOSX_ICON ${CMAKE_SOURCE_DIR}/res/nekoray.icns)
-if (APPLE)
-    target_sources(nekoray PRIVATE ${MACOSX_ICON})
-endif ()
 set_target_properties(nekoray PROPERTIES
-        MACOSX_BUNDLE_ICON_FILE "nekoray.icns"
-        RESOURCE ${MACOSX_ICON}
-        MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/res/MacOSXBundleInfo.plist
-        MACOSX_BUNDLE_GUI_IDENTIFIER moe.nekoray.macosx
-        MACOSX_BUNDLE TRUE
         WIN32_EXECUTABLE TRUE
 )
 

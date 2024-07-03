@@ -24,14 +24,6 @@
         <translation>Изменить</translation>
     </message>
     <message>
-        <source>Socks Listen Port</source>
-        <translation>Адрес входящих SOCKS</translation>
-    </message>
-    <message>
-        <source>HTTP Listen Port</source>
-        <translation>Адрес входящих HTTP</translation>
-    </message>
-    <message>
         <source>Enable</source>
         <translation>Вкл</translation>
     </message>
@@ -144,10 +136,6 @@
         <translation>Параметры ядра</translation>
     </message>
     <message>
-        <source>Switch core</source>
-        <translation>Выбор ядра</translation>
-    </message>
-    <message>
         <source>Extra Core</source>
         <translation>Дополнительные ядра</translation>
     </message>
@@ -168,10 +156,6 @@
         <translation>Не проверять подлинность TLS сертификатов по умолчанию</translation>
     </message>
     <message>
-        <source>Enable hook.js</source>
-        <translation>Использовать hook.js</translation>
-    </message>
-    <message>
         <source>Default uTLS Fingerprint</source>
         <translation>uTLS fingerprint по умолчанию</translation>
     </message>
@@ -186,14 +170,6 @@
     <message>
         <source>Please select the core name.</source>
         <translation>Выберите имя ядра.</translation>
-    </message>
-    <message>
-        <source>Confirmation</source>
-        <translation>Подтверждение</translation>
-    </message>
-    <message>
-        <source>Switching the core to %1, click &quot;Yes&quot; to complete the switch and the program will restart. This feature may be unstable, please do not switch frequently.</source>
-        <translation>Переключаем ядро на  %1, нажмите &quot;Да&quot; для изменения и перезапуска программы. Эта функция может быть нестабильной, поэтому, пожалуйста, не переключайте ядро часто.</translation>
     </message>
     <message>
         <source>Please select a PNG file.</source>
@@ -228,18 +204,6 @@
         <translation>Переопределить нижестоящий DNS</translation>
     </message>
     <message>
-        <source>It is recommended to leave it blank, but it sometimes does not work, at this time you can set this option.
-For NekoRay, this rewrites the underlying(localhost) DNS in Tun Mode.
-For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mode, and also URL Test.</source>
-        <translation>Рекомендуется оставить параметр пустым, но иногда это не срабатывает как надо, и в таком случае можно использовать эту опцию.
-Для  NekoRay  это переопределяет нижестоящий (localhost) DNS в  Tun режиме.
-Для  NekoBox  это переопределяет нижестоящий (localhost) DNS в  Tun режиме, нормальном режиме, а также при URL тесте.</translation>
-    </message>
-    <message>
-        <source>If you Tun Mode is not working, try to change this option.</source>
-        <translation>Если TUN-режим не работает, попробуйте изменить эту опцию.</translation>
-    </message>
-    <message>
         <source>Timeout (s)</source>
         <translation>Таймаут (с)</translation>
     </message>
@@ -258,6 +222,10 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
     <message>
         <source>Old Share Link Format</source>
         <translation>Поделиться ссылкой в старом формате</translation>
+    </message>
+    <message>
+        <source>Mixed (SOCKS+HTTP) Listen Port</source>
+        <translation type="unfinished"></translation>
     </message>
 </context>
 <context>
@@ -488,25 +456,6 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
     <message>
         <source>Confirm</source>
         <translation>Подтвердить</translation>
-    </message>
-</context>
-<context>
-    <name>DialogFirstSetup</name>
-    <message>
-        <source>First time setup</source>
-        <translation>Первоначальная настройка</translation>
-    </message>
-    <message>
-        <source>It looks like you are using this software for the first time, please select a core.
-
-These settings can be changed later.</source>
-        <translation>Привет! Кажется, вы запустили  эту программу впервые. Пожалуйста, выберите ядро.
-        
-Эти настройки будет возможно в дальнейшем изменить.</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>Выход</translation>
     </message>
 </context>
 <context>
@@ -1430,14 +1379,6 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</translation>
         <translation>Импортирован(ы) %1 профиль(ей)</translation>
     </message>
     <message>
-        <source>Http inbound is not enabled, can&apos;t set system proxy.</source>
-        <translation>HTTP inbound не включен в настройках, невозможно установить системный прокси.</translation>
-    </message>
-    <message>
-        <source>Settings</source>
-        <translation>Настройки</translation>
-    </message>
-    <message>
         <source>Please run NekoBox as admin</source>
         <translation>Пожалуйста, запустите NekoBox с правами администратора</translation>
     </message>
@@ -1448,10 +1389,6 @@ https://matsuridayo.github.io/n-configuration/#vpn-tun</translation>
     <message>
         <source>Not Running</source>
         <translation>Не запущен</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>Нет</translation>
     </message>
     <message>
         <source>Select</source>

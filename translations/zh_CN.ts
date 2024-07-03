@@ -12,16 +12,8 @@
         <translation>启用</translation>
     </message>
     <message>
-        <source>HTTP Listen Port</source>
-        <translation>HTTP 监听端口</translation>
-    </message>
-    <message>
         <source>Listen Address</source>
         <translation>监听地址</translation>
-    </message>
-    <message>
-        <source>Socks Listen Port</source>
-        <translation>Socks 监听端口</translation>
     </message>
     <message>
         <source>concurrency</source>
@@ -144,18 +136,6 @@
         <translation>取消</translation>
     </message>
     <message>
-        <source>Switch core</source>
-        <translation>切换核心</translation>
-    </message>
-    <message>
-        <source>Confirmation</source>
-        <translation>确认</translation>
-    </message>
-    <message>
-        <source>Switching the core to %1, click &quot;Yes&quot; to complete the switch and the program will restart. This feature may be unstable, please do not switch frequently.</source>
-        <translation>将核心切换到 %1。点击 &quot;是&quot; 完成切换，程序将重新启动。此功能可能不稳定，请不要频繁切换。</translation>
-    </message>
-    <message>
         <source>System proxy format</source>
         <translation>系统代理格式</translation>
     </message>
@@ -178,10 +158,6 @@
     <message>
         <source>Ignore TLS errors when updating subscription</source>
         <translation>更新订阅时忽略 TLS 错误</translation>
-    </message>
-    <message>
-        <source>Enable hook.js</source>
-        <translation>启用 hook.js 功能</translation>
     </message>
     <message>
         <source>Hide dashboard at startup</source>
@@ -220,18 +196,6 @@
         <translation>覆盖底层 DNS</translation>
     </message>
     <message>
-        <source>It is recommended to leave it blank, but it sometimes does not work, at this time you can set this option.
-For NekoRay, this rewrites the underlying(localhost) DNS in Tun Mode.
-For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mode, and also URL Test.</source>
-        <translation>建议留空，但有时会出现问题，这时可以设置这个选项。
-对于 NekoRay 来说，在 Tun 模式下会重写 underlying(localhost) DNS。
-对于 NekoBox 来说，在 Tun 模式、正常模式和 URL 测试中会重写 underlying(localhost) DNS。</translation>
-    </message>
-    <message>
-        <source>If you Tun Mode is not working, try to change this option.</source>
-        <translation>如果您的 Tun 模式有问题，请尝试更改此选项。</translation>
-    </message>
-    <message>
         <source>Default On</source>
         <translation>默认开启</translation>
     </message>
@@ -258,6 +222,10 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
     <message>
         <source>Interval (minute, invalid if less than 30)</source>
         <translation>时间间隔（分钟，少于 30 分钟无效）</translation>
+    </message>
+    <message>
+        <source>Mixed (SOCKS+HTTP) Listen Port</source>
+        <translation>Mixed (SOCKS+HTTP) 监听端口</translation>
     </message>
 </context>
 <context>
@@ -488,25 +456,6 @@ For NekoBox, this rewrites the underlying(localhost) DNS in Tun Mode, normal mod
     <message>
         <source>Reality short id. Accept only one value.</source>
         <translation>Reality short id. 只接受一个值。</translation>
-    </message>
-</context>
-<context>
-    <name>DialogFirstSetup</name>
-    <message>
-        <source>First time setup</source>
-        <translation>首次设置</translation>
-    </message>
-    <message>
-        <source>It looks like you are using this software for the first time, please select a core.
-
-These settings can be changed later.</source>
-        <translation>看来您是第一次使用该软件，请选择内核。
-
-这些设置可以稍后更改。</translation>
-    </message>
-    <message>
-        <source>Quit</source>
-        <translation>退出</translation>
     </message>
 </context>
 <context>
@@ -1244,10 +1193,6 @@ This needs to be run NekoBox with administrator privileges.</source>
     <message>
         <source>Imported %1 profile(s)</source>
         <translation>导入了 %1 个配置</translation>
-    </message>
-    <message>
-        <source>None</source>
-        <translation>无</translation>
     </message>
     <message>
         <source>Unavailable</source>
