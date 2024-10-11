@@ -58,8 +58,14 @@ void MainWindow::setup_grpc() {
 inline bool speedtesting = false;
 inline QList<QThread *> speedtesting_threads = {};
 
-void MainWindow::speedtest_current_group(int mode) {
+void MainWindow::speedtest_current_group(int mode, bool test_group) {
+    if (speedtesting) {
+        MessageBoxWarning(software_name, QObject::tr("The last speed test did not exit completely, please wait. If it persists, please restart the program."));
+        return;
+    }
+
     auto profiles = get_selected_or_group();
+    if (test_group) profiles = NekoGui::profileManager->CurrentGroup()->ProfilesWithOrder();
     if (profiles.isEmpty()) return;
     auto group = NekoGui::profileManager->CurrentGroup();
     if (group->archive) return;
@@ -75,11 +81,6 @@ void MainWindow::speedtest_current_group(int mode) {
     }
 
 #ifndef NKR_NO_GRPC
-    if (speedtesting) {
-        MessageBoxWarning(software_name, "The last speed test did not exit completely, please wait. If it persists, please restart the program.");
-        return;
-    }
-
     QStringList full_test_flags;
     if (mode == libcore::FullTest) {
         auto w = new QDialog(this);
@@ -150,7 +151,7 @@ void MainWindow::speedtest_current_group(int mode) {
                     //
                     libcore::TestReq req;
                     req.set_mode((libcore::TestMode) mode);
-                    req.set_timeout(3000);
+                    req.set_timeout(10 * 1000);
                     req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
 
                     //
@@ -181,7 +182,7 @@ void MainWindow::speedtest_current_group(int mode) {
                         }
                         //
                         auto config = new libcore::LoadConfigReq;
-                        config->set_core_config(QJsonObject2QString(c->coreConfig, true).toStdString());
+                        config->set_core_config(QJsonObject2QString(c->coreConfig, false).toStdString());
                         req.set_allocated_config(config);
                         req.set_in_address(profile->bean->serverAddress.toStdString());
 
@@ -250,7 +251,7 @@ void MainWindow::speedtest_current() {
     runOnNewThread([=] {
         libcore::TestReq req;
         req.set_mode(libcore::UrlTest);
-        req.set_timeout(3000);
+        req.set_timeout(10 * 1000);
         req.set_url(NekoGui::dataStore->test_latency_url.toStdString());
 
         bool rpcOK;
@@ -306,7 +307,7 @@ void MainWindow::neko_start(int _id) {
     auto neko_start_stage2 = [=] {
 #ifndef NKR_NO_GRPC
         libcore::LoadConfigReq req;
-        req.set_core_config(QJsonObject2QString(result->coreConfig, true).toStdString());
+        req.set_core_config(QJsonObject2QString(result->coreConfig, false).toStdString());
         req.set_enable_nekoray_connections(NekoGui::dataStore->connection_statistics);
         if (NekoGui::dataStore->traffic_loop_interval > 0) {
             req.add_stats_outbounds("proxy");
